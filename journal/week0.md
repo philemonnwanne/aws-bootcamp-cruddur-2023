@@ -104,3 +104,47 @@ You should see something like this:
 ```
 Don't bother copying the following fake details 💀
 
+
+## Enable Billing 
+
+We need to turn on Billing Alerts to recieve alerts...
+
+- In your Root Account go to the [Billing Page](https://console.aws.amazon.com/billing/)
+- Under `Billing Preferences` Choose `Receive Billing Alerts`
+- Save Preferences
+
+
+## Creating a Billing Alarm
+
+### Create SNS Topic
+
+- We need an SNS topic before we create an alarm.
+- The job of an SNS topic is to send us an alert when we get overbilled
+- [aws sns create-topic](https://docs.aws.amazon.com/cli/latest/reference/sns/create-topic.html)
+
+We'll create a SNS Topic called `billing-alarm`
+```bash
+aws sns create-topic --name billing-alarm
+```
+Which will return a TopicARN. It's important to note that this action is idempotent, so if the requester already owns a topic with the specified name, that topic’s ARN is returned without creating a new topic.
+
+We'll create a subscription supply the TopicARN and our Email
+```sh
+aws sns subscribe \
+    --topic-arn TopicARN \
+    --protocol email \
+    --notification-endpoint "your email goes in here"
+```
+
+Check your email and confirm the subscription
+
+#### Create Alarm
+
+- [aws cloudwatch put-metric-alarm](https://docs.aws.amazon.com/cli/latest/reference/cloudwatch/put-metric-alarm.html)
+- [Create an Alarm via AWS CLI](https://aws.amazon.com/premiumsupport/knowledge-center/cloudwatch-estimatedcharges-alarm/)
+- We need to update the configuration json script with the TopicARN we generated earlier
+- We will use a json file because --metrics is is required for expressions and so its easier to us a JSON file.
+
+```bash
+aws cloudwatch put-metric-alarm --cli-input-json file://aws/json/alarm_config.json
+```
