@@ -161,7 +161,7 @@ You should get an output below and also an email a few seconds later
 Check your email and confirm the subscription, which should redirect you to your browser and display the following page
 ![SNS-sub-confirmation](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week0/sns-sub-confirm.png)
 
-#### Create an Alarm
+### Create an Alarm
 
 - [aws cloudwatch put-metric-alarm](https://docs.aws.amazon.com/cli/latest/reference/cloudwatch/put-metric-alarm.html)
 - [Create an Alarm via AWS CLI](https://aws.amazon.com/premiumsupport/knowledge-center/cloudwatch-estimatedcharges-alarm/)
@@ -171,3 +171,4 @@ Check your email and confirm the subscription, which should redirect you to your
 ```bash
 aws cloudwatch put-metric-alarm --cli-input-json file://aws/json/alarm_config.json
 ```
+My cloudwatch alarm json file can be found here [alarm config](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/json/alarm_config.json)
