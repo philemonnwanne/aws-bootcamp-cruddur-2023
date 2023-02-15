@@ -167,12 +167,13 @@ Use the following link to learn how to create a cloudwatch alarm
 - [aws cloudwatch put-metric-alarm](https://docs.aws.amazon.com/cli/latest/reference/cloudwatch/put-metric-alarm.html)
 - [Create an Alarm via AWS CLI](https://aws.amazon.com/premiumsupport/knowledge-center/cloudwatch-estimatedcharges-alarm/)
 - We need to update the configuration json script with the TopicARN we generated earlier
-- We will use a json file because --metrics is is required for expressions and so its easier to us a JSON file.
+- We will use a json file because --metrics is is required for expressions and so its easier to us a JSON file
+- Reference the correct path to your alarm_config file
 
 ```bash
 aws cloudwatch put-metric-alarm --cli-input-json file://aws/json/alarm_config.json
 ```
-My cloudwatch alarm json file can be found here [alarm config](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/json/alarm_config.json)
+The `alarm_config.json` file can be found here [alarm config](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/json/alarm_config.json)
 
 
 ## Create an AWS Budget
@@ -187,10 +188,14 @@ aws sts get-caller-identity --query Account --output text
 - Supply your AWS Account ID
 - Update the json files
 - This is another case with AWS CLI it's just much easier to use json files due to lots of nested json
+- Reference the correct path to your budget and notification files
 
 ```bash
 aws budgets create-budget \
     --account-id AccountID \
     --budget file://aws/json/budget.json \
-    --notifications-with-subscribers file://aws/json/budget-notifications-with-subscribers.json
+    --notifications-with-subscribers file://aws/json/notifications-with-subscribers.json
 ```
+The `budget.json` file can be found here [budget config](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/json/budget.json)
+
+The `notifications-with-subscribers.json` file can be found here [notification config](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/json/notifications-with-subscribers.json)
