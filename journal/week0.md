@@ -138,7 +138,7 @@ you should get an output like below
 {
     "Topics": [
         {
-            "TopicArn": "arn:aws:sns:us-east-1:183066416469:billing-alarm"
+            "TopicArn": "arn:aws:sns:us-east-1:556700034211:billing-alarm"
         }
     ]
 }
