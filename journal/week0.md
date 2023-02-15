@@ -171,7 +171,7 @@ Use the following link to learn how to create a cloudwatch alarm
 - Reference the correct path to your alarm_config file
 
 ```bash
-aws cloudwatch put-metric-alarm --cli-input-json file://aws/json/alarm_config.json
+aws cloudwatch put-metric-alarm --cli-input-json file://journal/json/alarm_config.json
 ```
 The `alarm_config.json` file can be found here [alarm config](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/json/alarm_config.json)
 
@@ -193,8 +193,8 @@ aws sts get-caller-identity --query Account --output text
 ```bash
 aws budgets create-budget \
     --account-id AccountID \
-    --budget file://aws/json/budget.json \
-    --notifications-with-subscribers file://aws/json/notifications-with-subscribers.json
+    --budget file://journal/json/budget.json \
+    --notifications-with-subscribers file://journal/json/notifications-with-subscribers.json
 ```
 The `budget.json` file can be found here [budget config](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/json/budget.json)
 
