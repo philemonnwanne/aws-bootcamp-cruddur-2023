@@ -116,7 +116,7 @@ We need to turn on Billing Alerts to recieve alerts...
 
 ## Creating a Billing Alarm
 
-### Create SNS Topic
+### Create a SNS Topic
 
 - We need an SNS topic before we create an alarm.
 - The job of an SNS topic is to send us an alert when we get overbilled
@@ -128,7 +128,7 @@ aws sns create-topic --name billing-alarm
 ```
 Which will return a TopicARN. It's important to note that this action is idempotent, so if the requester already owns a topic with the specified name, that topic’s ARN is returned without creating a new topic.
 
-We'll create a subscription supply the TopicARN and our Email
+We will create a subscription then supply the `TopicARN` and our `Email`. The following subscribe command subscribes an email address to the topicARN created earlier.
 ```sh
 aws sns subscribe \
     --topic-arn TopicARN \
@@ -138,7 +138,7 @@ aws sns subscribe \
 
 Check your email and confirm the subscription
 
-#### Create Alarm
+#### Create an Alarm
 
 - [aws cloudwatch put-metric-alarm](https://docs.aws.amazon.com/cli/latest/reference/cloudwatch/put-metric-alarm.html)
 - [Create an Alarm via AWS CLI](https://aws.amazon.com/premiumsupport/knowledge-center/cloudwatch-estimatedcharges-alarm/)
