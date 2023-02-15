@@ -128,12 +128,34 @@ aws sns create-topic --name billing-alarm
 ```
 Which will return a TopicARN. It's important to note that this action is idempotent, so if the requester already owns a topic with the specified name, that topic’s ARN is returned without creating a new topic.
 
-We will create a subscription then supply the `TopicARN` and our `Email`. The following subscribe command subscribes an email address to the topicARN created earlier.
+You can confirm that your topic was created by running the following command
+```bash
+aws sns list-topics
+```
+
+you should get an output like below
+```json
+{
+    "Topics": [
+        {
+            "TopicArn": "arn:aws:sns:us-east-1:183066416469:billing-alarm"
+        }
+    ]
+}
+```
+
+We will now create a subscription then supply the `TopicARN` and our `Email`. The following subscribe command subscribes an email address to the topicARN created earlier.
 ```sh
 aws sns subscribe \
     --topic-arn TopicARN \
     --protocol email \
     --notification-endpoint "your email goes in here"
+```
+You should get an output below and also an email a few seconds later
+```json
+{
+    "SubscriptionArn": "pending confirmation"
+}
 ```
 
 Check your email and confirm the subscription
