@@ -7,8 +7,8 @@
     "BudgetType": "COST",
     "CostFilters": {
         "TagKeyValue": [
-            "user:Key$value1",
-            "user:Key$value2"
+            "Name: $philemonnwanne",
+            "Affiliation: $CloudBootCamp"
         ]
     },
     "CostTypes": {
