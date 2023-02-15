@@ -162,6 +162,7 @@ Check your email and confirm the subscription, which should redirect you to your
 ![SNS-sub-confirmation](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week0/sns-sub-confirm.png)
 
 ### Create a CloudWatch Alarm
+Use the following link to learn how to create a cloudwatch alarm
 
 - [aws cloudwatch put-metric-alarm](https://docs.aws.amazon.com/cli/latest/reference/cloudwatch/put-metric-alarm.html)
 - [Create an Alarm via AWS CLI](https://aws.amazon.com/premiumsupport/knowledge-center/cloudwatch-estimatedcharges-alarm/)
@@ -172,3 +173,24 @@ Check your email and confirm the subscription, which should redirect you to your
 aws cloudwatch put-metric-alarm --cli-input-json file://aws/json/alarm_config.json
 ```
 My cloudwatch alarm json file can be found here [alarm config](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/json/alarm_config.json)
+
+
+## Create an AWS Budget
+
+[aws budgets create-budget](https://docs.aws.amazon.com/cli/latest/reference/budgets/create-budget.html)
+
+Get your AWS Account ID
+```bash
+aws sts get-caller-identity --query Account --output text
+```
+
+- Supply your AWS Account ID
+- Update the json files
+- This is another case with AWS CLI it's just much easier to use json files due to lots of nested json
+
+```bash
+aws budgets create-budget \
+    --account-id AccountID \
+    --budget file://aws/json/budget.json \
+    --notifications-with-subscribers file://aws/json/budget-notifications-with-subscribers.json
+```
