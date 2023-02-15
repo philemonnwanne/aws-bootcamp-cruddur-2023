@@ -1,12 +1,4 @@
-<p align=right> 
-<a href="https://gitpod.io/#https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023">
-  <img
-    src="https://img.shields.io/badge/Contribute%20with-Gitpod-908a85?logo=gitpod"
-    alt="Contribute with Gitpod"
-    style="text-align: right"
-  />
-</a>
-</p>
+
 
 <!-- added this button to enable gitpods quick launch on my mac, as there is no gitpod extension for safari browsers -->
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023)
