@@ -71,3 +71,36 @@ tasks:
       rm -rf ../interim
 ```
 
+### Set AWS Env Vars
+
+We will set these credentials for the current bash terminal
+```php
+export AWS_ACCESS_KEY_ID=""
+export AWS_SECRET_ACCESS_KEY=""
+export AWS_DEFAULT_REGION=""
+```
+
+Run the below commands to make Gitpod persist the credentials after a workspace relaunch
+```php
+gp env AWS_ACCESS_KEY_ID=""
+gp env AWS_SECRET_ACCESS_KEY=""
+gp env AWS_DEFAULT_REGION=us-east-1
+```
+
+### Confirm your Identity
+
+Run the following command to ensure that the AWS CLI is working and you are the expected user
+```bash
+aws sts get-caller-identity
+```
+
+You should see something like this:
+```json
+{
+    "UserId": "DGT5ZRJKDT2ONP4ET7YE8",
+    "Account": "5567-0000-34211",
+    "Arn": "arn:aws:iam::556700034211:user/phil"
+}
+```
+Don't bother copying the following fake details 💀
+
