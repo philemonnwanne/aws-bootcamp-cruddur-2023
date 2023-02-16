@@ -199,3 +199,6 @@ aws budgets create-budget \
 The `budget.json` file can be found here [budget config](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/json/budget.json)
 
 The `notifications-with-subscribers.json` file can be found here [notification config](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/json/notifications-with-subscribers.json)
+
+## Home Work Challenges
+Logical Diagram: https://lucid.app/lucidchart/3c6da787-3c65-4940-80dc-6ad388e12bc4/edit?viewport_loc=29%2C142%2C1719%2C1039%2C0_0&invitationId=inv_fc373a10-0109-4ac5-9059-a23f066072e5
