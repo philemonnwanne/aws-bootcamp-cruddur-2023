@@ -223,5 +223,11 @@ For this challenge I created an event bridge rule which allows me to get SNS not
 
 ![Health_Dashboard](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week0/cloudbootcamp_eventbridge_rule.png)
 
-###
+### Service Limits
+
+I reviewed the technical and service limits for the following AWS services.
+
+Note: AWS now refers to these limits as `quotas`, I have attached an image below.
+
+![Service_Limits](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week0/service_limits.png)
 
