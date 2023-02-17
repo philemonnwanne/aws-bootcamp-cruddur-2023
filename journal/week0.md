@@ -198,7 +198,28 @@ aws budgets create-budget \
 ```
 The `budget.json` file can be found here [budget config](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/json/budget.json)
 
-The `notifications-with-subscribers.json` file can be found here [notification config](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/json/notifications-with-subscribers.json)
+The `notifications-with-subscribers.json` file can be found here [notification config](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/json/notifications-with-subscribers.json)<br>
 
-## Home Work Challenges
-Logical Diagram: https://lucid.app/lucidchart/3c6da787-3c65-4940-80dc-6ad388e12bc4/edit?viewport_loc=29%2C142%2C1719%2C1039%2C0_0&invitationId=inv_fc373a10-0109-4ac5-9059-a23f066072e5
+## Homework Challenges
+
+### Crudder Napkin Challenge
+For the Napkin challenge I had the following constraints:
+- I had no access to a napkin at my current location, so I ended up using a tissue paper
+- The tissue paper material wasn't so solid, so it had quite some holes while I was architecting on it
+
+Here is the end product
+
+![my_happy_napkin](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week0/crudder_napkin_conceptual_diagram_0.jpg)
+
+### Crudder Architectural Diagram
+
+Click [here](https://lucid.app/lucidchart/3c6da787-3c65-4940-80dc-6ad388e12bc4/edit?viewport_loc=29%2C142%2C1719%2C1039%2C0_0&invitationId=inv_fc373a10-0109-4ac5-9059-a23f066072e5) to view the logical diagram on Lucid Charts
+
+### Health Dashboard && SNS
+
+For this challenge I created an event bridge rule which allows me to get SNS notification about AWS service health issues via the Health Dashboard.
+
+![Health_Dashboard](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week0/cloudbootcamp_eventbridge_rule.png)
+
+###
+
