@@ -10,8 +10,10 @@
 
 # Week 0 — Billing and Architecture
 
-## Creating an IAM Admin User
-### Create a new User
+## Required Homework/Tasks
+
+### Creating an IAM Admin User
+#### Create a new User
 This section generally involves 3 steps
 
 #### Step 1
@@ -40,9 +42,9 @@ Review and create
 - Click on `Create access key`
 - Download the generated CSV containing your IAM credentials
 
-## Setting Up the AWS CLI
+### Setting Up the AWS CLI
 
-### Install AWS CLI
+#### Install AWS CLI
 
 - We are going to auto install the AWS CLI when our Gitpod enviroment lanuches.
 - We are going to set AWS CLI to use `partial autoprompt` mode which makes it easier to use AWS CLI commands.
@@ -105,7 +107,7 @@ You should see something like this:
 Don't bother copying the following fake details 💀
 
 
-## Enable Billing 
+### Enable Billing 
 
 We need to turn on Billing Alerts to recieve alerts...
 
@@ -114,9 +116,9 @@ We need to turn on Billing Alerts to recieve alerts...
 - Save Preferences
 
 
-## Creating a Billing Alarm
+### Creating a Billing Alarm
 
-### Create a SNS Topic
+#### Create a SNS Topic
 
 - We need an SNS topic before we create an alarm.
 - The job of an SNS topic is to send us an alert when we get overbilled
@@ -176,7 +178,7 @@ aws cloudwatch put-metric-alarm --cli-input-json file://journal/json/alarm_confi
 The `alarm_config.json` file can be found here [alarm config](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/json/alarm_config.json)
 
 
-## Create an AWS Budget
+### Create an AWS Budget
 
 [aws budgets create-budget](https://docs.aws.amazon.com/cli/latest/reference/budgets/create-budget.html)
 
