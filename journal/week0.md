@@ -231,3 +231,6 @@ Note: AWS now refers to these limits as `quotas`, I have attached an image below
 
 ![Service_Limits](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week0/service_limits.png)
 
+### Service Limits Request
+
+![Service_Limits](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week0/service_limit_request.png)
