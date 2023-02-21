@@ -118,3 +118,40 @@ networks:
   crudder-network:
     driver: bridge
 ```
+
+
+## Multistage Build
+
+Multistage build involves utilising multiple stages in a Dockerfile, while we build an image in order to significantly reduce the size of our docker image. In the end we’ll have an image that does the exact same thing but is almost 10 times smaller in size! The way we can achieve this is by keeping only the actual files needed for production and leaving unnecesary ones behind in the build stage. e.g (leaving behind tools we use for building the image).
+
+For this project we will have to redefine the Docker file used earlier for the Frontend app as it has more room for optimisation
+
+Switch to the frontend directory and edit the previous Dockerfile
+
+```bash
+
+cd frontend-react-js
+
+nano Dockerfile
+```
+
+Now edit the Dockerfile to look like the following
+
+```dockerfile
+# build stage
+FROM node:16.18 as build
+
+WORKDIR /frontend-react-js
+
+COPY . /frontend-react-js
+
+RUN rm -rf node_modules \
+    && npm install \
+    && npm run build
+
+# production stage
+FROM nginx:alpine
+
+# copy the final output of the build stage into the final stage
+COPY --from=build /frontend-react-js/build /usr/share/nginx/html
+```
