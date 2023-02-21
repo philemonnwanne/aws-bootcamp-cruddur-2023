@@ -1,3 +1,13 @@
+<p align=right> 
+<a href="https://gitpod.io/#https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023">
+  <img
+    src="https://img.shields.io/badge/Contribute%20with-Gitpod-908a85?logo=gitpod"
+    alt="Contribute with Gitpod"
+    style="text-align: right"
+  />
+</a>
+</p>
+
 # Week 1 — App Containerization
 
 To containerize the project we will do the following
