@@ -76,7 +76,7 @@ Make sure you are in the project root folder and create a `docker-compose` file
 version: "3.8"
 
 services:
-#Frontend Application
+# Frontend Application
   frontend:
     environment:
       REACT_APP_BACKEND_URL: "http://localhost:4567"
@@ -89,7 +89,7 @@ services:
     networks:
       - crudder-network
 
-#Backend Application
+# Backend Application
   backend:
     environment:
       FRONTEND_URL: "http://localhost:3000"
@@ -103,7 +103,7 @@ services:
     networks:
       - crudder-network
 
-#Docker Network
+# Docker Network
 networks:
   crudder-network:
     driver: bridge
