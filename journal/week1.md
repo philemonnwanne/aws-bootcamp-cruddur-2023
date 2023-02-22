@@ -235,6 +235,9 @@ volumes:
     driver: local
 ```
 
+Postgres Connection Made
+![postgres_local]()
+
 ## Run DynamoDB local Container
 
 To install and run DynamoDB local with Docker compose;
@@ -276,3 +279,6 @@ services:
 ```
 
 `Note:` Remember to update the `AWS_ACCESS_KEY_ID` & `AWS_SECRET_ACCESS_KEY` in our `.env` file
+
+Dynamodb Connection Made
+![dynamodb_local]()
