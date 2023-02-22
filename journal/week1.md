@@ -176,3 +176,77 @@ docker tag imagename philemonnwanne/imagename:version1.0
 docker image push philemonnwanne/imagename:version1.0
 ```
 
+
+## Add Postgres Container
+
+Now we're going to add a postgres container to our initial compose file and make sure it works locally
+
+First of go into the project root directory and create an `env` file
+
+```bash
+nano .env
+```
+
+Poulate the env file with the folowing value and remember not to commit it to version control
+
+```env
+POSTGRES_PASSWORD="your password goes in here"
+```
+
+Then we are going to add a new service for the postgres database to our compose file
+
+```yaml
+version: "3.8"
+
+services:
+# Frontend Service
+  frontend:
+    environment:
+      REACT_APP_BACKEND_URL: "http://localhost:4567"
+    build: ./frontend-react-js
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend-react-js:/frontend-react-js
+    networks:
+      - crudder-network
+
+# Backend Service
+  backend:
+    environment:
+      FRONTEND_URL: "http://localhost:3000"
+      BACKEND_URL: "http://localhost:4567"
+    build: ./backend-flask
+    container_name: backend
+    ports:
+      - "4567:4567"
+    volumes:
+      - ./backend-flask:/backend-flask
+    networks:
+      - crudder-network
+      
+ # Database Service[Postgres]
+  db:
+    image: postgres:alpine
+    restart: always
+    environment:
+      POSTGRES_USER: philemonnwanne
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - crudder-network
+      
+ # Docker Network
+networks:
+  crudder-network:
+    driver: bridge
+
+# Docker Volumes
+volumes:
+  db:
+    driver: local
+```
