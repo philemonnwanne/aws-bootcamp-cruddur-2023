@@ -177,9 +177,11 @@ docker image push philemonnwanne/imagename:version1.0
 ```
 
 
-## Add Postgres Container
+## Run Postgres Container
 
 Now we're going to add a postgres container to our initial compose file and make sure it works locally
+
+### Create `env`
 
 First of go into the project root directory and create an `env` file
 
@@ -193,38 +195,18 @@ Poulate the env file with the folowing key:pair value and remember not to commit
 POSTGRES_PASSWORD="your password goes in here"
 ```
 
+### Add Dynamodb Service
+
 Then we are going to add a new service for the postgres database to our compose file
+
+- Add the following code to the `docker-compose.yml` file.
 
 ```yaml
 version: "3.8"
 
 services:
-# Frontend Service
-  frontend:
-    environment:
-      REACT_APP_BACKEND_URL: "http://localhost:4567"
-    build: ./frontend-react-js
-    container_name: frontend
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend-react-js:/frontend-react-js
-    networks:
-      - crudder-network
-
-# Backend Service
-  backend:
-    environment:
-      FRONTEND_URL: "http://localhost:3000"
-      BACKEND_URL: "http://localhost:4567"
-    build: ./backend-flask
-    container_name: backend
-    ports:
-      - "4567:4567"
-    volumes:
-      - ./backend-flask:/backend-flask
-    networks:
-      - crudder-network
+...
+...
       
  # Database Service[Postgres]
   db:
@@ -250,3 +232,44 @@ volumes:
   db:
     driver: local
 ```
+
+## Run DynamoDB local Container
+
+To install and run DynamoDB local with Docker compose;
+
+- Add the following code to the `docker-compose.yml` file.
+
+```yaml
+version: "3.8"
+
+services:
+...
+...
+...
+
+# Database Service[dynamodb-local]
+  dynamodb-local:
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    image: "amazon/dynamodb-local:latest"
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./docker/dynamodb:/home/dynamodblocal/data"
+    working_dir: /home/dynamodblocal
+
+# AWS-CLI Service [To test dynamodb fucntionality]
+  app-node:
+    depends_on:
+      - dynamodb-local
+    image: amazon/aws-cli
+    container_name: app-node
+    ports:
+     - "8080:8080"
+    environment:
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+    command:
+      dynamodb describe-limits --endpoint-url http://dynamodb-local:8000 --region us-east-1
+```
+
