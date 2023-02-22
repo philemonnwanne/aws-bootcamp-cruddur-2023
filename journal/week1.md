@@ -112,6 +112,13 @@ services:
       - ./backend-flask:/backend-flask
     networks:
       - crudder-network
+      
+  healthcheck:
+  test: ["CMD", "curl", "-f", "http://localhost"]
+  interval: 1m30s
+  timeout: 10s
+  retries: 3
+  start_period: 40s
 
 # Docker Network
 networks:
@@ -155,3 +162,17 @@ FROM nginx:alpine
 # copy the final output of the build stage into the final stage
 COPY --from=build /frontend-react-js/build /usr/share/nginx/html
 ```
+
+## Tag and push a image to DockerHub
+
+### Tag an image
+
+```bash
+docker tag imagename philemonnwanne/imagename:version1.0
+```
+
+### Push the image
+```bash
+docker image push philemonnwanne/imagename:version1.0
+```
+
