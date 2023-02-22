@@ -108,12 +108,6 @@ services:
     container_name: backend
     ports:
       - "4567:4567"
-    healthcheck:
-      test: curl --fail http://localhost:80 || exit 1
-      interval: 60s
-      retries: 5
-      start_period: 20s
-      timeout: 10s
     volumes:
       - ./backend-flask:/backend-flask
     networks:
@@ -328,3 +322,82 @@ COPY --from=build /frontend-react-js/build /usr/share/nginx/html
 ```
 
 ![crudder_instance](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week1/crudder_ubuntu.png)
+
+
+## Health Check
+add the following line to the compose file created earlier to implement a health check
+
+```yaml
+version: "3.8"
+
+services:
+# Frontend Application
+  frontend:
+    environment:
+      REACT_APP_BACKEND_URL: "http://localhost:4567"
+    build: ./frontend-react-js
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend-react-js:/frontend-react-js
+    networks:
+      - crudder-network
+
+# Backend Application
+  backend:
+    environment:
+      FRONTEND_URL: "http://localhost:3000"
+      BACKEND_URL: "http://localhost:4567"
+    build: ./backend-flask
+    container_name: backend
+    ports:
+      - "4567:4567"
+    healthcheck:
+      test: curl --fail http://localhost:80 || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
+    volumes:
+      - ./backend-flask:/backend-flask
+    networks:
+      - crudder-network
+      
+ # Database Service[Postgres]
+  db:
+    image: postgres:alpine
+    restart: always
+    environment:
+      POSTGRES_USER: philemonnwanne
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - crudder-network
+      
+# Database Service[dynamodb-local]
+  dynamodb-local:
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    image: "amazon/dynamodb-local:latest"
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./docker/dynamodb:/home/dynamodblocal/data"
+    working_dir: /home/dynamodblocal
+    networks:
+      - crudder-network
+
+# Docker Network
+networks:
+  crudder-network:
+    driver: bridge
+
+# Docker Volumes
+volumes:
+  db:
+    driver: local
+```
