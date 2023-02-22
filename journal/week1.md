@@ -108,17 +108,17 @@ services:
     container_name: backend
     ports:
       - "4567:4567"
+    healthcheck:
+      test: curl --fail http://localhost:80 || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
     volumes:
       - ./backend-flask:/backend-flask
     networks:
       - crudder-network
       
-  healthcheck:
-  test: ["CMD", "curl", "-f", "http://localhost"]
-  interval: 1m30s
-  timeout: 10s
-  retries: 3
-  start_period: 40s
 
 # Docker Network
 networks:
