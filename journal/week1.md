@@ -325,7 +325,7 @@ COPY --from=build /frontend-react-js/build /usr/share/nginx/html
 
 
 ## Health Check
-add the following line to the compose file created earlier to implement a health check
+Add the following lines to the compose file created earlier to implement a health check
 
 ```yaml
 version: "3.8"
@@ -339,6 +339,12 @@ services:
     container_name: frontend
     ports:
       - "3000:3000"
+    healthcheck:
+      test: curl --fail http://localhost:80 || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
     volumes:
       - ./frontend-react-js:/frontend-react-js
     networks:
@@ -373,6 +379,12 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     ports:
       - '5432:5432'
+    healthcheck:
+      test: curl --fail http://localhost:80 || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
     volumes:
       - db:/var/lib/postgresql/data
     networks:
@@ -385,6 +397,12 @@ services:
     container_name: dynamodb-local
     ports:
       - "8000:8000"
+    healthcheck:
+      test: curl --fail http://localhost:80 || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
     volumes:
       - "./docker/dynamodb:/home/dynamodblocal/data"
     working_dir: /home/dynamodblocal
