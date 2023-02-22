@@ -284,3 +284,47 @@ services:
 Dynamodb Connection Made
 
 ![dynamodb_local](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week1/dynamodb_local.png)
+
+
+## Docker On AWS EC2
+Steps to recreate
+- Launch an ubuntu ec2 instance
+- login to the instance via ssh
+- install the docker engine here [docker engine](https://docs.docker.com/engine/install/ubuntu/)
+- clone the project repo fron github and rename it to `crudder`
+
+```bash
+git clone https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023.git crudder
+```
+Switch to the project directory and into the `frontend-react-js` directory
+
+```bash
+cd crudder/frontend-react-js
+```
+
+Create a Dockerfile
+```bash
+nano Dockerfile
+```
+
+Paste the following into the Dockerfile
+```Dockerfile
+# build stage
+FROM node:alpine as build
+
+WORKDIR /frontend-react-js
+
+COPY . .
+
+RUN rm -rf node_modules \
+    && npm install \
+    && npm run build
+
+# production stage
+FROM nginx:alpine
+
+# copy everything in the build stage into the final stage
+COPY --from=build /frontend-react-js/build /usr/share/nginx/html
+```
+
+![crudder_instance](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week1/crudder_ubuntu.png)
