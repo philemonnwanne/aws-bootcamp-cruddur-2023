@@ -236,7 +236,8 @@ volumes:
 ```
 
 Postgres Connection Made
-![postgres_local]()
+
+![postgres_local](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week1/postgres_local.png)
 
 ## Run DynamoDB local Container
 
@@ -281,4 +282,5 @@ services:
 `Note:` Remember to update the `AWS_ACCESS_KEY_ID` & `AWS_SECRET_ACCESS_KEY` in our `.env` file
 
 Dynamodb Connection Made
-![dynamodb_local]()
+
+![dynamodb_local](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week1/dynamodb_local.png)
