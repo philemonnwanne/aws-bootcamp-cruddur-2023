@@ -275,3 +275,4 @@ services:
       dynamodb describe-limits --endpoint-url http://dynamodb-local:8000 --region us-east-1
 ```
 
+`Note:` Remember to update the `AWS_ACCESS_KEY_ID` & `AWS_SECRET_ACCESS_KEY` in our `.env` file
