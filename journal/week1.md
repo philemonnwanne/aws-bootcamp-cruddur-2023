@@ -127,6 +127,8 @@ networks:
 ```
 
 
+# Homework Challenges
+
 ## Multistage Build
 
 Multistage build involves utilising multiple stages in a Dockerfile, while we build an image in order to significantly reduce the size of our docker image. In the end we’ll have an image that does the exact same thing but is almost 10 times smaller in size! The way we can achieve this is by keeping only the actual files needed for production and leaving unnecesary ones behind in the build stage. e.g (leaving behind tools we use for building the image).
@@ -195,7 +197,7 @@ Poulate the env file with the folowing key:pair value and remember not to commit
 POSTGRES_PASSWORD="your password goes in here"
 ```
 
-### Add Dynamodb Service
+### Add Postgres Service
 
 Then we are going to add a new service for the postgres database to our compose file
 
