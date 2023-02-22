@@ -187,7 +187,7 @@ First of go into the project root directory and create an `env` file
 nano .env
 ```
 
-Poulate the env file with the folowing value and remember not to commit it to version control
+Poulate the env file with the folowing key:pair value and remember not to commit it to version control
 
 ```env
 POSTGRES_PASSWORD="your password goes in here"
