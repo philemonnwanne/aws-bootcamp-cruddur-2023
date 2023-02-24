@@ -3,7 +3,7 @@ FROM node:16.17.0-bullseye-slim AS build
 
 WORKDIR /frontend-react-js
 
-COPY --chown=node:node package.json /frontend-react-js/
+COPY --chown=node:node package.json .
 
 ENV NODE_ENV=production
 
@@ -20,6 +20,6 @@ USER node
 
 COPY --from=build /frontend-react-js/node_modules /frontend-react-js/node_modules
 
-COPY --chown=node:node . /frontend-react-js/
+COPY --chown=node:node . .
 
 CMD ["npm", "start"]
