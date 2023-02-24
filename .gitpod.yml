@@ -9,18 +9,19 @@ tasks:
       sudo ./aws/install
       cd $THEIA_WORKSPACE_ROOT
       rm -rf ../interim
-      
+
   - name: postgres
     init: |
       curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc|sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/postgresql.gpg
       echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" |sudo tee  /etc/apt/sources.list.d/pgdg.list
       sudo apt update
       sudo apt install -y postgresql-client-13 libpq-dev
-      
+
   - name: mod-init-script
-    init: |
+    command: |
       chmod 700 /workspace/aws-bootcamp-cruddur-2023/backend-flask/init.sh
 
 vscode:
   extensions:
     - 42Crunch.vscode-openapi
+    - cweijan.vscode-postgresql-client2
