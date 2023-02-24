@@ -10,7 +10,19 @@
 
 # Week 1 — App Containerization
 
-To containerize the project we will do the following
+## Homework Challenges [Done](#Homework-Challenges)
+- [x] [Run the Dockerfile CMD as an external script]()
+- [x] [Push and tag a image to DockerHub]()
+- [x] [Use multi-stage building for a Dockerfile build]()
+- [x] [Implement a healthcheck in the V3 Docker compose file]()
+- [x] [Research best practices of Dockerfiles and attempt to implement it in your Dockerfile]()
+- [x] [Learn how to install Docker on your localmachine and get the same containers running outside of Gitpod / Codespaces]()
+- [x] [Launch an EC2 instance that has docker installed, and pull a container to demonstrate you can run your own docker processes]()
+
+
+
+### To containerize the project we will do the following
+
 - clone the project repo to our local machine 
 - make sure both apps are running fine locally 
 - create a Dockerfle for each one
