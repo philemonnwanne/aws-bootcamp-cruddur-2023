@@ -331,7 +331,7 @@ Add the following lines to the compose file created earlier to implement a healt
 version: "3.8"
 
 services:
-# Frontend Application
+# Frontend Service
   frontend:
     environment:
       REACT_APP_BACKEND_URL: "http://localhost:4567"
@@ -340,17 +340,18 @@ services:
     ports:
       - "3000:3000"
     healthcheck:
-      test: curl --fail http://localhost:80 || exit 1
-      interval: 60s
+      test: npm --version || exit 1
+      interval: 30s
       retries: 5
-      start_period: 20s
+      start_period: 5s
       timeout: 10s
     volumes:
       - ./frontend-react-js:/frontend-react-js
+      - /frontend-react-js/node_modules
     networks:
       - crudder-network
 
-# Backend Application
+# Backend Service
   backend:
     environment:
       FRONTEND_URL: "http://localhost:3000"
@@ -359,57 +360,35 @@ services:
     container_name: backend
     ports:
       - "4567:4567"
-    healthcheck:
-      test: curl --fail http://localhost:80 || exit 1
-      interval: 60s
-      retries: 5
-      start_period: 20s
-      timeout: 10s
     volumes:
       - ./backend-flask:/backend-flask
     networks:
       - crudder-network
-      
- # Database Service[Postgres]
-  db:
+
+# Database Service[Postgres]
+  postgres-db:
     image: postgres:alpine
     restart: always
     environment:
       POSTGRES_USER: philemonnwanne
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    container_name: postgres-db
     ports:
       - '5432:5432'
-    healthcheck:
-      test: curl --fail http://localhost:80 || exit 1
-      interval: 60s
-      retries: 5
-      start_period: 20s
-      timeout: 10s
     volumes:
       - db:/var/lib/postgresql/data
-    networks:
-      - crudder-network
-      
-# Database Service[dynamodb-local]
+
   dynamodb-local:
     command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
     image: "amazon/dynamodb-local:latest"
     container_name: dynamodb-local
     ports:
       - "8000:8000"
-    healthcheck:
-      test: curl --fail http://localhost:80 || exit 1
-      interval: 60s
-      retries: 5
-      start_period: 20s
-      timeout: 10s
     volumes:
       - "./docker/dynamodb:/home/dynamodblocal/data"
     working_dir: /home/dynamodblocal
-    networks:
-      - crudder-network
 
-# Docker Network
+# Docker Networks
 networks:
   crudder-network:
     driver: bridge
