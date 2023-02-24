@@ -401,4 +401,4 @@ volumes:
 
 #### Dockerfile Output
 
-![health_check](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week1/health_check.png)
+![health_check](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week1/health_check_1.png)
