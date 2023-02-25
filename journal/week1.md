@@ -416,3 +416,19 @@ volumes:
 #### Dockerfile Output
 
 ![health_check](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week1/health_check_1.png)
+
+
+
+## Best Dockerfile Practices Researched and Implemented
+
+- Used explicit and deterministic Docker base image tags
+- Installed only production dependencies in the Node and Python based Docker image
+- Optimized Node.js tooling for production
+- Used small sized images to reduce attack surface area
+- Did not run containers as root where possible
+- Found and fixed security vulnerabilities in my docker image using Snyk
+- Implemented multi-stage builds
+- Used `.env` to handle secrets and made sure not to push them to version control
+- Kept unnecessary files out of the Docker images
+- Mounted secrets into the Docker build image
+- Optimized caching for image layers when building an image
