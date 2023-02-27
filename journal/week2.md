@@ -93,3 +93,7 @@ from opentelemetry.sdk.trace.export import SimpleSpanProcessor, ConsoleSpanExpor
 simple_processor = SimpleSpanProcessor(ConsoleSpanExporter())
 provider.add_span_processor(simple_processor)
 ```
+
+## @Jessitrons hack for Confirming honeycomb API Keys
+
+Visit `honecomb-whoami.glitch.me` and paste in your `HONEYCOMB_API_KEY`. This will return some info regarding the API Key
