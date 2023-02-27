@@ -79,8 +79,6 @@ RUN pip3 install -r requirements.txt
 COPY . .
 
 ENV FLASK_ENV=development \
-    FRONTEND_URL="*" \
-    BACKEND_URL="*" \
     PORT=4567
 
 EXPOSE ${PORT}
@@ -98,24 +96,25 @@ Make sure you are in the project root folder and create a `docker-compose` file
 version: "3.8"
 
 services:
-# Frontend Application
+# Frontend Service
   frontend:
     environment:
-      REACT_APP_BACKEND_URL: "http://localhost:4567"
+      REACT_APP_BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
     build: ./frontend-react-js
     container_name: frontend
     ports:
       - "3000:3000"
     volumes:
       - ./frontend-react-js:/frontend-react-js
+      - /frontend-react-js/node_modules
     networks:
       - crudder-network
 
-# Backend Application
+# Backend Service
   backend:
     environment:
-      FRONTEND_URL: "http://localhost:3000"
-      BACKEND_URL: "http://localhost:4567"
+      FRONTEND_URL: "https://3000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+      BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
     build: ./backend-flask
     container_name: backend
     ports:
@@ -124,9 +123,8 @@ services:
       - ./backend-flask:/backend-flask
     networks:
       - crudder-network
-      
 
-# Docker Network
+# Docker Networks
 networks:
   crudder-network:
     driver: bridge
@@ -155,22 +153,31 @@ nano Dockerfile
 Now edit the Dockerfile to look like the following
 
 ```dockerfile
-# build stage
-FROM node:16.18 as build
+# build image
+FROM node:16.17.0-bullseye-slim AS build
 
 WORKDIR /frontend-react-js
 
-COPY . /frontend-react-js
+COPY --chown=node:node package.json .
 
-RUN rm -rf node_modules \
-    && npm install \
-    && npm run build
+ENV NODE_ENV=production
 
-# production stage
-FROM nginx:alpine
+RUN npm install --production
 
-# copy the final output of the build stage into the final stage
-COPY --from=build /frontend-react-js/build /usr/share/nginx/html
+# production image
+FROM node:lts-alpine3.17
+
+ENV NODE_ENV production
+
+WORKDIR /frontend-react-js
+
+USER node
+
+COPY --from=build /frontend-react-js/node_modules /frontend-react-js/node_modules
+
+COPY --chown=node:node . .
+
+CMD ["npm", "start"]
 ```
 
 ## Tag and push a image to DockerHub
@@ -310,29 +317,9 @@ Switch to the project directory and into the `frontend-react-js` directory
 cd crudder/frontend-react-js
 ```
 
-Create a Dockerfile
+Create a Dockerfile and paste the contents of our previoud Dockerfile
 ```bash
 nano Dockerfile
-```
-
-Paste the following into the Dockerfile
-```Dockerfile
-# build stage
-FROM node:alpine as build
-
-WORKDIR /frontend-react-js
-
-COPY . .
-
-RUN rm -rf node_modules \
-    && npm install \
-    && npm run build
-
-# production stage
-FROM nginx:alpine
-
-# copy everything in the build stage into the final stage
-COPY --from=build /frontend-react-js/build /usr/share/nginx/html
 ```
 
 ![crudder_instance](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week1/crudder_ubuntu.png)
@@ -348,7 +335,7 @@ services:
 # Frontend Service
   frontend:
     environment:
-      REACT_APP_BACKEND_URL: "http://localhost:4567"
+      REACT_APP_BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
     build: ./frontend-react-js
     container_name: frontend
     ports:
@@ -368,8 +355,8 @@ services:
 # Backend Service
   backend:
     environment:
-      FRONTEND_URL: "http://localhost:3000"
-      BACKEND_URL: "http://localhost:4567"
+      FRONTEND_URL: "https://3000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+      BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
     build: ./backend-flask
     container_name: backend
     ports:
@@ -391,7 +378,8 @@ services:
       - '5432:5432'
     volumes:
       - db:/var/lib/postgresql/data
-
+      
+# Database Service[dynamodb_local]
   dynamodb-local:
     command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
     image: "amazon/dynamodb-local:latest"
