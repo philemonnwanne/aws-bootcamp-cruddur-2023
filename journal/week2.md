@@ -78,3 +78,18 @@ export OTEL_EXPORTER_OTLP_ENDPOINT="https://api.honeycomb.io/"
 export OTEL_EXPORTER_OTLP_HEADERS="x-honeycomb-team=your-api-key"
 export OTEL_SERVICE_NAME="your-service-name"
 ```
+
+## Troubleshooting API Keys
+If you're not recieving any data in honeycomb it might be because you are using the wrong API keys. Try the below steps to find out if  data is actually being sent out of your app.
+
+Edit `app.py` and add the following lines to it:
+
+```python
+...
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor, ConsoleSpanExporter
+
+...
+# Simple Span Processor [show output in the logs withing the backend-flask app (STDOUT)]
+simple_processor = SimpleSpanProcessor(ConsoleSpanExporter())
+provider.add_span_processor(simple_processor)
+```
