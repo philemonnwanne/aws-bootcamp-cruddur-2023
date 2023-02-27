@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-# Frontend Service
+  # Frontend Service
   frontend:
     environment:
       REACT_APP_BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
@@ -9,23 +9,20 @@ services:
     container_name: frontend
     ports:
       - "3000:3000"
-    healthcheck:
-      test: npm --version || exit 1
-      interval: 30s
-      retries: 5
-      start_period: 5s
-      timeout: 10s
     volumes:
       - ./frontend-react-js:/frontend-react-js
       - /frontend-react-js/node_modules
     networks:
       - crudder-network
 
-# Backend Service
+  # Backend Service
   backend:
     environment:
       FRONTEND_URL: "https://3000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
       BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "https://api.honeycomb.io/"
+      OTEL_EXPORTER_OTLP_HEADERS: "x-honeycomb-team=${HONEYCOMB_API_KEY}"
+      OTEL_SERVICE_NAME: "cruddur-backend-flask"
     build: ./backend-flask
     container_name: backend
     ports:
@@ -35,36 +32,7 @@ services:
     networks:
       - crudder-network
 
-# Database Service[Postgres]
-  postgres-db:
-    image: postgres:alpine
-    restart: always
-    environment:
-      POSTGRES_USER: philemonnwanne
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-    container_name: postgres-db
-    ports:
-      - '5432:5432'
-    volumes:
-      - db:/var/lib/postgresql/data
-      
-# Database Service[dynamodb_local]
-  dynamodb-local:
-    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
-    image: "amazon/dynamodb-local:latest"
-    container_name: dynamodb-local
-    ports:
-      - "8000:8000"
-    volumes:
-      - "./docker/dynamodb:/home/dynamodblocal/data"
-    working_dir: /home/dynamodblocal
-
 # Docker Networks
 networks:
   crudder-network:
     driver: bridge
-
-# Docker Volumes
-volumes:
-  db:
-    driver: local
