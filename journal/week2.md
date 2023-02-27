@@ -97,3 +97,53 @@ provider.add_span_processor(simple_processor)
 ## @Jessitrons hack for Confirming honeycomb API Keys
 
 Visit `honecomb-whoami.glitch.me` and paste in your `HONEYCOMB_API_KEY`. This will return some info regarding the API Key
+
+## Creating a Tracer
+
+To create spans, you need to get a `Tracer`. Add the following lines of code to the `services/home_activities.py file`.
+
+```python
+from opentelemetry import trace
+
+tracer = trace.get_tracer("tracer.name.here")
+```
+
+When you create a Tracer, OpenTelemetry requires you to give it a name as a string. This string is the only required parameter.
+
+When traces are sent to Honeycomb, the name of the `Tracer` is turned into the `library.name` field, which can be used to show all spans created from a particular `tracer`.
+
+The `library.name` field is also used with traces created from instrumentation libraries.
+
+### Creating Spans
+
+Now we have a tracer configured, we can create spans to describe what is happening in your application. For example, this could be a HTTP handler, a long running operation, or a database fetch.
+
+```python
+from opentelemetry import trace
+
+tracer = trace.get_tracer(__name__)
+with tracer.start_as_current_span("http-handler"):
+    with tracer.start_as_current_span("my-cool-function"):
+        # do something
+```
+
+### Adding Attributes to Spans
+
+It is often beneficial to add context to a currently executing span in a trace. For example, you may have an application or service that handles users and you want to associate the user with the span when querying your dataset in Honeycomb. In order to do this, get the current span from the context and set an attribute with the user ID:
+
+```python
+from opentelemetry import trace
+
+...
+
+tracer = trace.get_tracer(__name__)
+with tracer.start_as_current_span("http-handler") as outer_span:
+    with tracer.start_as_current_span("my-cool-function") as inner_span:
+        outer_span.set_attribute("outer", True)
+        inner_span.set_attribute("inner", True)
+
+...
+
+span = trace.get_current_span()
+span.set_attribute("user.id", user.id())
+```
