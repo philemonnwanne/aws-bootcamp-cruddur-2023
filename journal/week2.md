@@ -225,6 +225,28 @@ aws xray create-group \
 
 ### Create a sampling rule
 
+Move into the `backend-flask` directory and create a `xray.json` file
+
+```json
+{
+  "SamplingRule": {
+      "RuleName": "Cruddur",
+      "ResourceARN": "*",
+      "Priority": 9000,
+      "FixedRate": 0.1,
+      "ReservoirSize": 5,
+      "ServiceName": "Cruddur",
+      "ServiceType": "*",
+      "Host": "*",
+      "HTTPMethod": "*",
+      "URLPath": "*",
+      "Version": 1
+  }
+}
+```
+
+While still in the `backend-flask` directory run the below command to generate a `sampling rule`.
+
 ```bash
-aws xray create-sampling-rule --cli-input-json file://aws/json/xray.json
+aws xray create-sampling-rule --cli-input-json file://xray.json
 ```
