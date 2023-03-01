@@ -47,7 +47,7 @@ RequestsInstrumentor().instrument()
 
 # To use a plugin, call configure on the xray_recorder
 xray_url = os.getenv("AWS_XRAY_URL")
-xray_recorder.configure(service='cruddur-backend-flask', dynamic_naming=xray_url)
+xray_recorder.configure(service='backend', dynamic_naming=xray_url)
 XRayMiddleware(app, xray_recorder)
 
 frontend = os.getenv('FRONTEND_URL')

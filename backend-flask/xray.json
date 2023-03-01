@@ -1,15 +1,15 @@
 {
   "SamplingRule": {
-    "RuleName": "Cruddur",
+    "RuleName": "cruddur",
     "ResourceARN": "*",
     "Priority": 9000,
     "FixedRate": 0.1,
     "ReservoirSize": 5,
-    "ServiceName": "cruddur-backend-flask",
+    "ServiceName": "backend",
     "ServiceType": "*",
     "Host": "*",
     "HTTPMethod": "*",
-    "URLPath": "*",
+    "URLPath": "/api/*",
     "Version": 1
   }
 }
