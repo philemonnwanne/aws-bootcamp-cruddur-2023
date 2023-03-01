@@ -49,9 +49,11 @@ services:
       AWS_REGION: "${AWS_REGION}"
     command:
       - "xray -o -b xray-daemon:2000"
-    container_name: xray
+    container_name: xray-daemon
     ports:
       - 2000:2000/udp
+    networks:
+      - ${APP_NAME}-network
       
   # Database Service[Postgres]
   # postgres-db:

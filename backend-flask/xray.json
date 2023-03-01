@@ -9,7 +9,7 @@
     "ServiceType": "*",
     "Host": "*",
     "HTTPMethod": "*",
-    "URLPath": "/api/*",
+    "URLPath": "*",
     "Version": 1
   }
 }
