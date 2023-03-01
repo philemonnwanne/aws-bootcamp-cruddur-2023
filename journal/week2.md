@@ -250,3 +250,10 @@ While still in the `backend-flask` directory run the below command to generate a
 ```bash
 aws xray create-sampling-rule --cli-input-json file://backend-flask/xray.json
 ```
+
+Add the following variables to the `backend-flask` service docker-compose file
+
+```env
+AWS_XRAY_URL: "*4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}*"
+AWS_XRAY_DAEMON_ADDRESS: "xray-daemon:2000"
+```
