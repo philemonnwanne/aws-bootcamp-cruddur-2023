@@ -29,6 +29,8 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: "https://api.honeycomb.io/"
       OTEL_EXPORTER_OTLP_HEADERS: "x-honeycomb-team=${HONEYCOMB_API_KEY}"
       OTEL_SERVICE_NAME: "${APP_NAME}-backend-flask"
+      AWS_XRAY_URL: "${GITPOD_AWS_XRAY_URL}"
+      AWS_XRAY_DAEMON_ADDRESS: "${AWS_XRAY_DAEMON_ADDRESS}"
     build: ./backend-flask
     container_name: backend
     ports:
