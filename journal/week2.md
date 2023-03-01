@@ -12,7 +12,7 @@
 
 ## Required Homework/Tasks
 
-## Instrument HoneyComb for Flask
+## Intrument with HoneyComb
 
 ### Configure OpenTelemetry for Python
 
@@ -150,7 +150,7 @@ span = trace.get_current_span()
 span.set_attribute("user.id", user.id())
 ```
 
-## Instrument AWS X-Ray for Flask
+## Instrument with AWS X-Ray
 
 ### :mega: OpenTelemetry Python with AWS X-Ray
 
@@ -257,3 +257,51 @@ Add the following variables to the `backend-flask` service docker-compose file
 AWS_XRAY_URL: "*4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}*"
 AWS_XRAY_DAEMON_ADDRESS: "xray-daemon:2000"
 ```
+
+## CloudWatch Logs
+
+Add the following to the `requirements.txt` file.
+
+```txt
+...
+watchtower
+```
+
+Use the following configuration to send Flask logs to a CloudWatch Logs stream called `cruddur`:
+
+Add the following lines of code to `app.py`
+
+```python
+...
+import watchtower, logging
+from time import strftime
+
+# Configuring Logger to Use CloudWatch
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
+console_handler = logging.StreamHandler()
+cw_handler = watchtower.CloudWatchLogHandler(log_group='cruddur')
+LOGGER.addHandler(console_handler)
+LOGGER.addHandler(cw_handler)
+
+@app.after_request
+def after_request(response):
+    timestamp = strftime('[%Y-%b-%d %H:%M]')
+    LOGGER.error('%s %s %s %s %s %s', timestamp, request.remote_addr, request.method, request.scheme, request.full_path, response.status)
+    return response
+```
+
+We'll log something in an API endpoint
+
+```python
+LOGGER.info('IAM Active Logger! from  /api/activities/home')
+```
+
+Set the following environment vars in the `backend-flask` service section of `docker-compose.yml`
+
+```yml
+AWS_DEFAULT_REGION: "${AWS_DEFAULT_REGION}"
+AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+```
+`Note` Passing `AWS_REGION` doesn't seem to get picked up by `boto3` so pass `AWS_DEFAULT_REGION` instead

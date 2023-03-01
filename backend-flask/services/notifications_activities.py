@@ -11,14 +11,16 @@ dict = {
   }
 # Add metadata or annotation here if necessary
 segment.put_metadata('people', dict, 'namespace')
-# Close the segment
-xray_recorder.end_segment()
 
-# Start a segment
+# Start a subsegment
 subsegment = xray_recorder.begin_subsegment('annotations')
 subsegment.put_annotation('id', 12345)
 # Close the subsegment
 xray_recorder.end_subsegment()
+
+# Close the segment
+xray_recorder.end_segment()
+
 
 class NotificationsActivities:
   def run():
