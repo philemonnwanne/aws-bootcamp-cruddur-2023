@@ -4,7 +4,7 @@ services:
   # Frontend Service
   frontend:
     environment:
-      REACT_APP_BACKEND_URL: "${GITPOD_BACKEND_URL}"
+      REACT_APP_BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
     build: ./frontend-react-js
     container_name: frontend
     ports:
@@ -24,12 +24,12 @@ services:
   # Backend Service
   backend:
     environment:
-      FRONTEND_URL: "${GITPOD_FRONTEND_URL}"
-      BACKEND_URL: "${GITPOD_BACKEND_URL}"
+      FRONTEND_URL: "https://3000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+      BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
       OTEL_EXPORTER_OTLP_ENDPOINT: "https://api.honeycomb.io/"
       OTEL_EXPORTER_OTLP_HEADERS: "x-honeycomb-team=${HONEYCOMB_API_KEY}"
       OTEL_SERVICE_NAME: "${APP_NAME}-backend-flask"
-      AWS_XRAY_URL: "${GITPOD_AWS_XRAY_URL}"
+      AWS_XRAY_URL: "*4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}*"
       AWS_XRAY_DAEMON_ADDRESS: "${AWS_XRAY_DAEMON_ADDRESS}"
     build: ./backend-flask
     container_name: backend
