@@ -1,0 +1,88 @@
+version: "3.8"
+
+services:
+  # Frontend Service
+  frontend:
+    environment:
+      REACT_APP_BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+    build: ./frontend-react-js
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: npm --version || exit 1
+      interval: 30s
+      retries: 5
+      start_period: 5s
+      timeout: 10s
+    volumes:
+      - ./frontend-react-js:/frontend-react-js
+      - /frontend-react-js/node_modules
+    networks:
+      - ${APP_NAME}-network
+
+  # Backend Service
+  backend:
+    environment:
+      FRONTEND_URL: "https://3000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+      BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "https://api.honeycomb.io/"
+      OTEL_EXPORTER_OTLP_HEADERS: "x-honeycomb-team=${HONEYCOMB_API_KEY}"
+      OTEL_SERVICE_NAME: "${APP_NAME}-backend-flask"
+      AWS_XRAY_URL: "*4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}*"
+      AWS_XRAY_DAEMON_ADDRESS: "xray-daemon:2000"
+    build: ./backend-flask
+    container_name: backend
+    ports:
+      - "4567:4567"
+    volumes:
+      - ./backend-flask:/backend-flask
+    networks:
+      - ${APP_NAME}-network
+
+  # AWS X-Ray Daemon Service
+  xray-daemon:
+    image: "amazon/aws-xray-daemon"
+    environment:
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+      AWS_REGION: "${AWS_REGION}"
+    command:
+      - "xray -o -b xray-daemon:2000"
+    container_name: xray
+    ports:
+      - 2000:2000/udp
+      
+  # Database Service[Postgres]
+  # postgres-db:
+  #   image: postgres:alpine
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: "${POSTGRES_USER}"
+  #     POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+  #   container_name: postgres-db
+  #   ports:
+  #     - '5432:5432'
+  #   volumes:
+  #     - db:/var/lib/postgresql/data
+
+  # Database Service[dynamodb_local]
+  # dynamodb-local:
+  #   command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+  #   image: "amazon/dynamodb-local:latest"
+  #   container_name: dynamodb-local
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - "./docker/dynamodb:/home/dynamodblocal/data"
+  #   working_dir: /home/dynamodblocal
+
+  # Docker Networks
+networks:
+  cruddur-network:
+    driver: bridge
+
+# Docker Volumes
+# volumes:
+#   db:
+#     driver: local
