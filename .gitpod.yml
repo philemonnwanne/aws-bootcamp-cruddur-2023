@@ -20,6 +20,7 @@ tasks:
   - name: mod-init-script
     command: |
       chmod 700 /workspace/aws-bootcamp-cruddur-2023/backend-flask/init.sh
+      clear
 
 vscode:
   extensions:
