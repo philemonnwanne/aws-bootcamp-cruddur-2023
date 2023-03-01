@@ -12,11 +12,13 @@
 
 ## Required Homework/Tasks
 
-## Configure OpenTelemetry for Python
+## Instrument HoneyComb for Flask
+
+### Configure OpenTelemetry for Python
 
 This guide will help you add OpenTelemetry to our backend service, and ensure that instrumentation data is being sent to Honeycomb.
 
-## Requirements
+### Requirements
 
 These instructions will explain how to set up manual instrumentation for a service written in Python. In order to follow along, you will need:
 
@@ -38,10 +40,9 @@ opentelemetry-sdk
 opentelemetry-exporter-otlp-proto-http
 opentelemetry-instrumentation-flask
 opentelemetry-instrumentation-requests
-
 ```
 
-## Initialize
+### Initialize
 
 Add these lines to your existing Flask app initialization file `app.py` (or similar). These updates will create and initialize a `tracer` and `Flask instrumentation` to send data to Honeycomb.
 
@@ -67,7 +68,7 @@ FlaskInstrumentor().instrument_app(app)
 RequestsInstrumentor().instrument()
 ```
 
-## Configure and Run
+### Configure and Run
 
 Configure `OpenTelemetry` to send events to `Honeycomb` using environment variables.
 
@@ -79,8 +80,9 @@ export OTEL_EXPORTER_OTLP_HEADERS="x-honeycomb-team=your-api-key"
 export OTEL_SERVICE_NAME="your-service-name"
 ```
 
-## Troubleshooting API Keys
-If you're not recieving any data in honeycomb it might be because you are using the wrong API keys. Try the below steps to find out if  data is actually being sent out of your app.
+### Troubleshooting API Keys
+
+If you're not recieving any data in honeycomb it might be because you are using the wrong API keys. Try the below steps to find out if data is actually being sent out of your app.
 
 Edit `app.py` and add the following lines to it:
 
@@ -94,11 +96,11 @@ simple_processor = SimpleSpanProcessor(ConsoleSpanExporter())
 provider.add_span_processor(simple_processor)
 ```
 
-## @Jessitrons hack for Confirming honeycomb API Keys
+### @Jessitrons hack for Confirming honeycomb API Keys
 
 Visit `honecomb-whoami.glitch.me` and paste in your `HONEYCOMB_API_KEY`. This will return some info regarding the API Key
 
-## Creating a Tracer
+### Creating a Tracer
 
 To create spans, you need to get a `Tracer`. Add the following lines of code to the `services/home_activities.py file`.
 
@@ -146,4 +148,83 @@ with tracer.start_as_current_span("http-handler") as outer_span:
 
 span = trace.get_current_span()
 span.set_attribute("user.id", user.id())
+```
+
+## Instrument AWS X-Ray for Flask
+
+### :mega: OpenTelemetry Python with AWS X-Ray
+
+AWS X-Ray supports using OpenTelemetry Python and the AWS Distro for OpenTelemetry (ADOT) Collector to instrument your application and send trace data to X-Ray. The OpenTelemetry SDKs are an industry-wide standard for tracing instrumentation.
+
+### Installing
+
+The AWS X-Ray SDK for Python is compatible with Python 2.7, 3.4, 3.5, and 3.6.
+
+Install the SDK using the following command (the SDK's non-testing dependencies will be installed).
+
+```
+pip install aws-xray-sdk
+```
+
+Add the SDK as a dependency in your requirements.txt file.
+
+#### Example `requirements.txt`
+
+```txt
+aws-xray-sdk==2.4.2
+boto3==1.4.4
+botocore==1.5.55
+Django==1.11.3
+```
+
+`Note` If you use Elastic Beanstalk to deploy your application, Elastic Beanstalk installs all of the packages in requirements.txt automatically.
+
+Add the following to
+
+### Tracing incoming requests with the X-Ray SDK for Python middleware
+
+When you add the middleware to your application and configure a segment name, the X-Ray SDK for Python creates a segment for each sampled request.
+
+The X-Ray SDK for Python supports the following middleware to instrument incoming HTTP requests:
+
+- Django
+- Flask
+- Bottle
+
+## Adding the middleware to your application (flask)
+
+To instrument your Flask application, first configure a segment name on the xray_recorder. Then, use the XRayMiddleware function to patch your Flask application in code.
+
+Add the following lines of code to `app.py`
+
+```python
+...
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
+
+app = Flask(__name__)
+
+...
+xray_url = os.getenv("AWS_XRAY_URL")
+xray_recorder.configure(service='cruddur-backend-flask', dynamic_naming=xray_url)
+XRayMiddleware(app, xray_recorder)
+```
+
+This tells the X-Ray recorder to trace requests served by your Flask application with the default sampling rate. You can configure the recorder in code to apply custom sampling rules or change other settings.
+
+### Create an AWS X-Ray group
+
+```bash
+FLASK_ADDRESS="https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+aws xray create-group \
+   --group-name "Cruddur" \
+   --filter-expression "service(\"cruddur-backend-flask\") {fault OR error}"
+```
+
+`Note` You won't be able to create a group if it already exists.
+
+### Create a sampling rule
+
+```bash
+aws xray create-sampling-rule --cli-input-json file://aws/json/xray.json
 ```
