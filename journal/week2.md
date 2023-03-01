@@ -248,5 +248,5 @@ Move into the `backend-flask` directory and create a `xray.json` file
 While still in the `backend-flask` directory run the below command to generate a `sampling rule`.
 
 ```bash
-aws xray create-sampling-rule --cli-input-json file://xray.json
+aws xray create-sampling-rule --cli-input-json file://backend-flask/xray.json
 ```
