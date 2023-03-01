@@ -78,7 +78,7 @@ services:
 
   # Docker Networks
 networks:
-  "${APP_NAME}-network":
+  cruddur-network:
     driver: bridge
 
 # Docker Volumes
