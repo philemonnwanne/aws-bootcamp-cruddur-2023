@@ -1,4 +1,25 @@
 from datetime import datetime, timedelta, timezone
+from aws_xray_sdk.core import xray_recorder
+
+# Start a segment
+segment = xray_recorder.begin_segment('user_activities')
+dict = {
+    "customer_category" : 124,
+    "zip_code" : 98101,
+    "country" : "United States",
+    "internal" : False
+  }
+# Add metadata or annotation here if necessary
+segment.put_metadata('people', dict, 'namespace')
+# Close the segment
+xray_recorder.end_segment()
+
+# Start a segment
+subsegment = xray_recorder.begin_subsegment('annotations')
+subsegment.put_annotation('id', 12345)
+# Close the subsegment
+xray_recorder.end_subsegment()
+
 class NotificationsActivities:
   def run():
     now = datetime.now(timezone.utc).astimezone()
