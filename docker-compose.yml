@@ -49,6 +49,7 @@ services:
       AWS_REGION: "${AWS_REGION}"
     command:
       - "xray -o -b xray-daemon:2000"
+    container_name: xray
     ports:
       - 2000:2000/udp
       
