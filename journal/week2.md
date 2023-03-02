@@ -313,13 +313,15 @@ AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
 
 Installation
 
-To Install `pyrollbar` and `blinker` packages with pip, add the following to the `requirements.txt` file.
+Make sure to install `Flask` and `blinker` dependencies first, by adding the following to `requirements.txt` file.
 
-```bash
-pip install rollbar blinker
+```txt
+...
+rollbar 
+blinker
 ```
 
-We need to set access token
+We need to set the `rollbar` access token
 
 ```bash
 export ROLLBAR_ACCESS_TOKEN=""
