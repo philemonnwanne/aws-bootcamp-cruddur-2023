@@ -305,3 +305,66 @@ AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
 AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
 ```
 `Note` Passing `AWS_REGION` doesn't seem to get picked up by `boto3` so pass `AWS_DEFAULT_REGION` instead
+
+
+## Rollbar
+
+### Add the Flask SDK
+
+Installation
+
+To Install `pyrollbar` and `blinker` packages with pip, add the following to the `requirements.txt` file.
+
+```bash
+pip install rollbar blinker
+```
+
+We need to set access token
+
+```bash
+export ROLLBAR_ACCESS_TOKEN=""
+gp env ROLLBAR_ACCESS_TOKEN=""
+```
+
+Add to `backend-flask` for docker-compose.yml
+
+```yaml
+ROLLBAR_ACCESS_TOKEN: "${ROLLBAR_ACCESS_TOKEN}"
+```
+
+### Add Rollbar to Your Flask Application
+
+Add the following lines of code to `app.py`
+
+```python
+## Rollbar init code. You'll need the following to use Rollbar with Flask.
+import rollbar
+import rollbar.contrib.flask
+from flask import got_request_exception
+
+rollbar_access_token = os.getenv('ROLLBAR_ACCESS_TOKEN')
+@app.before_first_request
+def init_rollbar():
+    """init rollbar module"""
+    rollbar.init(
+        # access token
+        rollbar_access_token,
+        # environment name
+        'production',
+        # server root directory, makes tracebacks prettier
+        root=os.path.dirname(os.path.realpath(__file__)),
+        # flask already sets up logging
+        allow_logging_basic_config=False)
+
+    # send exceptions from `app` to rollbar, using flask's signal system.
+    got_request_exception.connect(rollbar.contrib.flask.report_exception, app)
+```
+
+We'll add an endpoint just for testing rollbar to `app.py`
+
+```python
+@app.route('/rollbar/test')
+def rollbar_test():
+    rollbar.report_message('Hello World!', 'warning')
+    return "Hello World!"
+```

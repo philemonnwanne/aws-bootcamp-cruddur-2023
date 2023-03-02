@@ -7,6 +7,9 @@ opentelemetry-exporter-otlp-proto-http
 opentelemetry-instrumentation-flask
 opentelemetry-instrumentation-requests
 # Install these packages to instrument a Flask app with AWS X-Ray
-aws-xray-sdk
+# aws-xray-sdk
 # Install Watchtower for Logging
-watchtower
+# watchtower
+# Install Rollbar and Blinker for collecting errors
+rollbar
+blinker
