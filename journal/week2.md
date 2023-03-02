@@ -367,8 +367,8 @@ We'll add an endpoint just for testing rollbar to `app.py`
 ```python
 @app.route('/rollbar/test')
 def rollbar_test():
-    rollbar.report_message('Hello World!', 'warning')
-    return "Hello World!"
+    rollbar.report_message('Just for test', 'warning')
+    return "Just for test"
 ```
 
 #### Rollbar Sample Error
