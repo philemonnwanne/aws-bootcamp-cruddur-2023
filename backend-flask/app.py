@@ -96,7 +96,7 @@ def init_rollbar():
         # access token
         rollbar_access_token,
         # environment name
-        'cruddurtest',
+        'cruddur_test',
         # server root directory, makes tracebacks prettier
         root=os.path.dirname(os.path.realpath(__file__)),
         # flask already sets up logging
