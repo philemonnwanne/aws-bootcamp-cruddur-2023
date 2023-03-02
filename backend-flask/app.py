@@ -96,7 +96,7 @@ def init_rollbar():
         # access token
         rollbar_access_token,
         # environment name
-        'production',
+        'development',
         # server root directory, makes tracebacks prettier
         root=os.path.dirname(os.path.realpath(__file__)),
         # flask already sets up logging
@@ -109,7 +109,7 @@ def init_rollbar():
 @app.route('/rollbar/test')
 def rollbar_test():
     rollbar.report_message('Hello World!', 'warning')
-    return "Hello World!"
+    "Hello World!"
 
 @app.route("/api/message_groups", methods=['GET'])
 def data_message_groups():
