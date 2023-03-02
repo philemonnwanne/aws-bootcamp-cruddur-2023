@@ -370,3 +370,7 @@ def rollbar_test():
     rollbar.report_message('Hello World!', 'warning')
     return "Hello World!"
 ```
+
+#### Rollbar Error
+
+![rollbar_error_page](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week2/rollbar_error_page.png)
