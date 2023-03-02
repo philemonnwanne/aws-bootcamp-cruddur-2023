@@ -230,12 +230,12 @@ Move into the `backend-flask` directory and create a `xray.json` file
 ```json
 {
   "SamplingRule": {
-      "RuleName": "Cruddur",
+      "RuleName": "cruddur",
       "ResourceARN": "*",
       "Priority": 9000,
       "FixedRate": 0.1,
       "ReservoirSize": 5,
-      "ServiceName": "Cruddur",
+      "ServiceName": "backend-flask",
       "ServiceType": "*",
       "Host": "*",
       "HTTPMethod": "*",
@@ -371,6 +371,6 @@ def rollbar_test():
     return "Hello World!"
 ```
 
-#### Rollbar Error
+#### Rollbar Sample Error
 
 ![rollbar_error_page](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week2/rollbar_error_page.png)
