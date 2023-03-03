@@ -374,3 +374,12 @@ def rollbar_test():
 #### Rollbar Sample Error
 
 ![rollbar_error_page](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week2/rollbar_error_page.png)
+
+
+
+## Homework Challenges
+
+### Implement HoneyComb Custom Instrumentation
+
+![honeycomb_custom_span](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week2/honeycomb_custom_span.png)
+honeycomb_custom_span

@@ -105,11 +105,22 @@ def init_rollbar():
     # send exceptions from `app` to rollbar, using flask's signal system.
     got_request_exception.connect(rollbar.contrib.flask.report_exception, app)
 
+# custom tracing to display user handle & id
+@app.route('/honeycomb/test')
+def honeycomb_test():
+    user_handle_1  = 'philemonnwanne'
+    user_id_1 = 'trgge6464jdbg84720acz'
+    with tracer.start_as_current_span("show_user_handle")as user_handle:
+      with tracer.start_as_current_span("show_user_id")as user_id:
+        user_handle.set_attribute("user.handle", user_handle_1)
+        user_id.set_attribute("user.id", user_id_1)
+        return ["Display user details in trace", user_id_1, user_handle_1]
+
 # ROllbar sample test code
 @app.route('/rollbar/test')
 def rollbar_test():
-    rollbar.report_message('Hello World!', 'warning')
-    "Hello World!"
+    rollbar.report_message('Just for test!', 'warning')
+    return "Just for test!"
 
 @app.route("/api/message_groups", methods=['GET'])
 def data_message_groups():
