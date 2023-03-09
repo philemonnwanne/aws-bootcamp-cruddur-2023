@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import request
+from flask import Request
 from flask_cors import CORS, cross_origin
 import os
 
@@ -27,6 +28,7 @@ from opentelemetry.sdk.trace.export import SimpleSpanProcessor, ConsoleSpanExpor
 import rollbar
 import rollbar.contrib.flask
 from flask import got_request_exception
+import logging
 
 
 # CloudWatch Logs
@@ -105,11 +107,35 @@ def init_rollbar():
     # send exceptions from `app` to rollbar, using flask's signal system.
     got_request_exception.connect(rollbar.contrib.flask.report_exception, app)
 
+## Set up Person Tracking in Rollbar
+from flask import Request
+class CustomRequest(Request):
+    @property
+    def rollbar_person(self):
+        # 'id' is required, 'username' and 'email' are indexed but optional.
+        # all values are strings.
+        return {
+          'id': '248959df-3079-4947-b847-9e0892d1bab4', 
+          'username': 'philemonnwanne', 
+          'email': 'user@example.com'
+        }
+
+app.request_class = CustomRequest
+
+## Simple flask app below
+
+@app.route('/')
+def hello():
+    print("in hello")
+    x = None
+    x[5]
+    return "Hello Entergalactics!"
+
 # custom tracing to display user handle & id
 @app.route('/honeycomb/test')
 def honeycomb_test():
     user_handle_1  = 'philemonnwanne'
-    user_id_1 = 'trgge6464jdbg84720acz'
+    user_id_1 = '248959df-3079-4947-b847-9e0892d1bab4'
     with tracer.start_as_current_span("show_user_handle")as user_handle:
       with tracer.start_as_current_span("show_user_id")as user_id:
         user_handle.set_attribute("user.handle", user_handle_1)
