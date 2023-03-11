@@ -4,6 +4,25 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+import { trace, context, } from '@opentelemetry/api';
+
+const tracer = trace.getTracer();
+
+const rootSpan = tracer.startActiveSpan('document_load', span => {
+  //start span when navigating to page
+  span.setAttribute('pageUrlwindow', window.location.href);
+  window.onload = () => {
+    // ... do loading things
+    function myFunction() {
+      alert("Page is loaded");
+    }
+    // ... attach timing information
+    span.end(); //once page is loaded, end the span
+  };
+
+});
+
+
 const el_main = document.getElementsByTagName('main')[0];
 const root = ReactDOM.createRoot(el_main);
 root.render(

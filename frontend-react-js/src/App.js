@@ -1,3 +1,4 @@
+import './tracing.js';
 import './App.css';
 
 import HomeFeedPage from './pages/HomeFeedPage';

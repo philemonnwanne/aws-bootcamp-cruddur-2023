@@ -3,11 +3,16 @@ FROM node:16.17.0-bullseye-slim AS build
 
 WORKDIR /frontend-react-js
 
-COPY --chown=node:node package.json .
+COPY --chown=node:node ./*.json .
 
 ENV NODE_ENV=production
 
-RUN npm install --production
+RUN npm install --save \
+        @opentelemetry/api \
+        @opentelemetry/sdk-trace-web \
+        @opentelemetry/exporter-trace-otlp-http \
+        @opentelemetry/context-zone \
+        @opentelemetry/instrumentation
 
 # production image
 FROM node:lts-alpine3.17
