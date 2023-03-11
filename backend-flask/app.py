@@ -108,16 +108,15 @@ def init_rollbar():
     got_request_exception.connect(rollbar.contrib.flask.report_exception, app)
 
 ## Set up Person Tracking in Rollbar
-from flask import Request
 class CustomRequest(Request):
     @property
     def rollbar_person(self):
         # 'id' is required, 'username' and 'email' are indexed but optional.
         # all values are strings.
         return {
-          'id': '248959df-3079-4947-b847-9e0892d1bab4', 
-          'username': 'philemonnwanne', 
-          'email': 'user@example.com'
+          'id': '248959df-3079-4947-b847-9e0892d1bab4',
+          # 'username': 'user-01-cruddur', 
+          # 'email': 'user@example.com'
         }
 
 app.request_class = CustomRequest
