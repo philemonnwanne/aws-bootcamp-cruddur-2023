@@ -12,7 +12,8 @@ RUN npm install --save \
         @opentelemetry/sdk-trace-web \
         @opentelemetry/exporter-trace-otlp-http \
         @opentelemetry/context-zone \
-        @opentelemetry/instrumentation
+        @opentelemetry/instrumentation \
+        aws-amplify
 
 # production image
 FROM node:lts-alpine3.17
