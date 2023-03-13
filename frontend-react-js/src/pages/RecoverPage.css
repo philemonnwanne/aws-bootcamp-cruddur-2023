@@ -71,7 +71,9 @@ article.recover-article  h2 {
   color: #fff;
 }
 
-
+.proceed {
+  color: #fff;
+}
 
 article.recover-article button[type='submit'] {
   font-weight: 800;

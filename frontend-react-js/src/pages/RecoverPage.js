@@ -122,7 +122,7 @@ export default function RecoverPage() {
 
   const success = () => {
     return (<form>
-      <p>Your password has been successfully reset!</p>
+      <p className="proceed">Your password has been successfully reset!</p>
       <Link to="/signin" className="proceed">Proceed to Signin</Link>
     </form>
     )
