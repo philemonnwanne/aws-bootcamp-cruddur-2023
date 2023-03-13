@@ -89,3 +89,34 @@ const signOut = async () => {
 }
 ```
 
+Next we will update the signin page
+
+```js
+import { Auth } from 'aws-amplify';
+
+const onsubmit = async (event) => {
+    setErrors('')
+    event.preventDefault();
+      Auth.signIn(email, password)
+        .then(user => {
+          localStorage.setItem("access_token", user.signInUserSession.accessToken.jwtToken)
+          window.location.href = "/"
+        })
+        .catch(error => {
+          if (error.code == 'UserNotConfirmedException') {
+            window.location.href = "/confirm"
+          }
+          setErrors(error.message)
+        });
+    return false
+}
+
+let errors;
+if (cognitoErrors){
+  errors = <div className='errors'>{cognitoErrors}</div>;
+}
+
+// just before submit component
+{errors}
+```
+
