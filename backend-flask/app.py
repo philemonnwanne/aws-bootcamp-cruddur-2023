@@ -16,19 +16,19 @@ from services.create_message import *
 from services.show_activity import *
 
 # Initialize tracing with HoneyComb
-from opentelemetry import trace
-from opentelemetry.instrumentation.flask import FlaskInstrumentor
-from opentelemetry.instrumentation.requests import RequestsInstrumentor
-from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.sdk.trace.export import SimpleSpanProcessor, ConsoleSpanExporter
+# from opentelemetry import trace
+# from opentelemetry.instrumentation.flask import FlaskInstrumentor
+# from opentelemetry.instrumentation.requests import RequestsInstrumentor
+# from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+# from opentelemetry.sdk.trace import TracerProvider
+# from opentelemetry.sdk.trace.export import BatchSpanProcessor
+# from opentelemetry.sdk.trace.export import SimpleSpanProcessor, ConsoleSpanExporter
 
 ## Rollbar init code
-import rollbar
-import rollbar.contrib.flask
-from flask import got_request_exception
-import logging
+# import rollbar
+# import rollbar.contrib.flask
+# from flask import got_request_exception
+# import logging
 
 
 # CloudWatch Logs
@@ -49,22 +49,22 @@ import logging
 
 
 # Initialize tracing and an exporter that can send data to Honeycomb
-provider = TracerProvider()
-# Batch Span Processor
-processor = BatchSpanProcessor(OTLPSpanExporter())
-provider.add_span_processor(processor)
-# Simple Span Processor [show output in the logs withing the backend-flask app (STDOUT)]
-simple_processor = SimpleSpanProcessor(ConsoleSpanExporter())
-provider.add_span_processor(simple_processor)
+# provider = TracerProvider()
+# # Batch Span Processor
+# processor = BatchSpanProcessor(OTLPSpanExporter())
+# provider.add_span_processor(processor)
+# # Simple Span Processor [show output in the logs withing the backend-flask app (STDOUT)]
+# simple_processor = SimpleSpanProcessor(ConsoleSpanExporter())
+# provider.add_span_processor(simple_processor)
 
-trace.set_tracer_provider(provider)
-tracer = trace.get_tracer(__name__)
+# trace.set_tracer_provider(provider)
+# tracer = trace.get_tracer(__name__)
 
 app = Flask(__name__)
 
 # Initialize automatic instrumentation with Flask
-FlaskInstrumentor().instrument_app(app)
-RequestsInstrumentor().instrument()
+# FlaskInstrumentor().instrument_app(app)
+# RequestsInstrumentor().instrument()
 
 # To use a plugin, call configure on the xray_recorder
 # xray_url = os.getenv("AWS_XRAY_URL")
@@ -77,8 +77,8 @@ origins = [frontend, backend]
 cors = CORS(
   app, 
   resources={r"/api/*": {"origins": origins}},
-  expose_headers="location,link",
-  allow_headers="content-type,if-modified-since",
+  headers=['Content-Type', 'Authorization'], 
+  expose_headers='Authorization',
   methods="OPTIONS,GET,HEAD,POST"
 )
 
@@ -91,21 +91,21 @@ cors = CORS(
 
 # Init Rollbar
 rollbar_access_token = os.getenv('ROLLBAR_ACCESS_TOKEN')
-@app.before_first_request
-def init_rollbar():
-    """init rollbar module"""
-    rollbar.init(
-        # access token
-        rollbar_access_token,
-        # environment name
-        'cruddur_test',
-        # server root directory, makes tracebacks prettier
-        root=os.path.dirname(os.path.realpath(__file__)),
-        # flask already sets up logging
-        allow_logging_basic_config=False)
+# @app.before_first_request
+# def init_rollbar():
+#     """init rollbar module"""
+#     rollbar.init(
+#         # access token
+#         rollbar_access_token,
+#         # environment name
+#         'cruddur_test',
+#         # server root directory, makes tracebacks prettier
+#         root=os.path.dirname(os.path.realpath(__file__)),
+#         # flask already sets up logging
+#         allow_logging_basic_config=False)
 
-    # send exceptions from `app` to rollbar, using flask's signal system.
-    got_request_exception.connect(rollbar.contrib.flask.report_exception, app)
+#     # send exceptions from `app` to rollbar, using flask's signal system.
+#     got_request_exception.connect(rollbar.contrib.flask.report_exception, app)
 
 ## Set up Person Tracking in Rollbar
 class CustomRequest(Request):
@@ -122,30 +122,29 @@ class CustomRequest(Request):
 app.request_class = CustomRequest
 
 ## Simple flask app below
-
-@app.route('/')
-def hello():
-    print("in hello")
-    x = None
-    x[5]
-    return "Hello Entergalactics!"
+# @app.route('/')
+# def hello():
+#     print("in hello")
+#     x = None
+#     x[5]
+#     return "Hello Entergalactics!"
 
 # custom tracing to display user handle & id
-@app.route('/honeycomb/test')
-def honeycomb_test():
-    user_handle_1  = 'philemonnwanne'
-    user_id_1 = '248959df-3079-4947-b847-9e0892d1bab4'
-    with tracer.start_as_current_span("show_user_handle")as user_handle:
-      with tracer.start_as_current_span("show_user_id")as user_id:
-        user_handle.set_attribute("user.handle", user_handle_1)
-        user_id.set_attribute("user.id", user_id_1)
-        return ["Display user details in trace", user_id_1, user_handle_1]
+# @app.route('/honeycomb/test')
+# def honeycomb_test():
+#     user_handle_1  = 'philemonnwanne'
+#     user_id_1 = '248959df-3079-4947-b847-9e0892d1bab4'
+#     with tracer.start_as_current_span("show_user_handle")as user_handle:
+#       with tracer.start_as_current_span("show_user_id")as user_id:
+#         user_handle.set_attribute("user.handle", user_handle_1)
+#         user_id.set_attribute("user.id", user_id_1)
+#         return ["Display user details in trace", user_id_1, user_handle_1]
 
 # ROllbar sample test code
-@app.route('/rollbar/test')
-def rollbar_test():
-    rollbar.report_message('Just for test!', 'warning')
-    return "Just for test!"
+# @app.route('/rollbar/test')
+# def rollbar_test():
+#     rollbar.report_message('Just for test!', 'warning')
+#     return "Just for test!"
 
 @app.route("/api/message_groups", methods=['GET'])
 def data_message_groups():
@@ -184,6 +183,10 @@ def data_create_message():
 
 @app.route("/api/activities/home", methods=['GET'])
 def data_home():
+  app.logger.debug('Hello worlds')
+  print(
+    request.headers.get('Authorization')
+  )
   data = HomeActivities.run()
   return data, 200
 

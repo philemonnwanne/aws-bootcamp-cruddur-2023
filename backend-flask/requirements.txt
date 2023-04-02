@@ -1,11 +1,11 @@
 flask
 flask-cors
 # Install these packages to instrument a Flask app with OpenTelemetry
-opentelemetry-api
-opentelemetry-sdk
-opentelemetry-exporter-otlp-proto-http
-opentelemetry-instrumentation-flask
-opentelemetry-instrumentation-requests
+# opentelemetry-api
+# opentelemetry-sdk
+# opentelemetry-exporter-otlp-proto-http
+# opentelemetry-instrumentation-flask
+# opentelemetry-instrumentation-requests
 # Install these packages to instrument a Flask app with AWS X-Ray
 # aws-xray-sdk
 # Install Watchtower for Logging
