@@ -207,3 +207,13 @@ const onsubmit_send_code = async (event) => {
     return false
   }
   ```
+
+## Authenticating Server Side
+
+Add in the `HomeFeedPage.js` a header eto pass along the access token
+
+```js
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("access_token")}`
+  }
+```
