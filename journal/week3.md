@@ -210,7 +210,7 @@ const onsubmit_send_code = async (event) => {
 
 ## Authenticating Server Side
 
-Add in the `HomeFeedPage.js` a header eto pass along the access token
+Add in the `HomeFeedPage.js` a header to pass along the access token
 
 ```js
   headers: {
