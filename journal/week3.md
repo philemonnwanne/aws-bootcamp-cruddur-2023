@@ -14,11 +14,11 @@ This will add the `aws-amplify` package as a dependency in the `package.json` fi
 ## Configure Amplify
 Move into the frontend `src` directory
 
-``bash
+```bash
 cd frontend/src
 ```
 
- Add the following line of code to the `App.js` file
+Add the following line of code to the `App.js` file
 
 ```js
 import { Amplify } from 'aws-amplify';
