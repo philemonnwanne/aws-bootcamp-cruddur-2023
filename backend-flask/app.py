@@ -1,6 +1,5 @@
 from flask import Flask
 from flask import request
-from flask import Request
 from flask_cors import CORS, cross_origin
 import os
 
@@ -14,6 +13,9 @@ from services.message_groups import *
 from services.messages import *
 from services.create_message import *
 from services.show_activity import *
+
+# Cognito Token Verification
+from lib.cognito_jwt_token import CognitoJwtToken, TokenVerifyError, extract_access_token
 
 # Initialize tracing with HoneyComb
 # from opentelemetry import trace
@@ -62,6 +64,12 @@ from services.show_activity import *
 
 app = Flask(__name__)
 
+cognito_jwt_token = CognitoJwtToken(
+  user_pool_id = os.getenv("AWS_COGNITO_USER_POOL_ID"), 
+  user_pool_client_id = os.getenv("AWS_COGNITO_USER_POOL_CLIENT_ID"),
+  region = os.getenv("AWS_DEFAULT_REGION")
+)
+
 # Initialize automatic instrumentation with Flask
 # FlaskInstrumentor().instrument_app(app)
 # RequestsInstrumentor().instrument()
@@ -90,7 +98,7 @@ cors = CORS(
 #     return response
 
 # Init Rollbar
-rollbar_access_token = os.getenv('ROLLBAR_ACCESS_TOKEN')
+# rollbar_access_token = os.getenv('ROLLBAR_ACCESS_TOKEN')
 # @app.before_first_request
 # def init_rollbar():
 #     """init rollbar module"""
@@ -108,18 +116,18 @@ rollbar_access_token = os.getenv('ROLLBAR_ACCESS_TOKEN')
 #     got_request_exception.connect(rollbar.contrib.flask.report_exception, app)
 
 ## Set up Person Tracking in Rollbar
-class CustomRequest(Request):
-    @property
-    def rollbar_person(self):
-        # 'id' is required, 'username' and 'email' are indexed but optional.
-        # all values are strings.
-        return {
-          'id': '248959df-3079-4947-b847-9e0892d1bab4',
-          # 'username': 'user-01-cruddur', 
-          # 'email': 'user@example.com'
-        }
+# class CustomRequest(Request):
+#     @property
+#     def rollbar_person(self):
+#         # 'id' is required, 'username' and 'email' are indexed but optional.
+#         # all values are strings.
+#         return {
+#           'id': '248959df-3079-4947-b847-9e0892d1bab4',
+#           # 'username': 'user-01-cruddur', 
+#           # 'email': 'user@example.com'
+#         }
 
-app.request_class = CustomRequest
+# app.request_class = CustomRequest
 
 ## Simple flask app below
 # @app.route('/')
@@ -183,11 +191,18 @@ def data_create_message():
 
 @app.route("/api/activities/home", methods=['GET'])
 def data_home():
-  app.logger.debug('Hello worlds')
-  app.logger.debug(
-    request.headers.get('Authorization')
-  )
+  access_token = extract_access_token (request.headers)
+  try:
+    claims = cognito_jwt_token.verify(access_token)
+    # authenticated request
+    app.logger.debug('authenticated')
+    app.logger.debug(claims)
+  except TokenVerifyError as e:
+    # unauthenticated request
+    app.logger.debug('unauthenticated')
+
   data = HomeActivities.run()
+
   return data, 200
 
 @app.route("/api/activities/notifications", methods=['GET'])

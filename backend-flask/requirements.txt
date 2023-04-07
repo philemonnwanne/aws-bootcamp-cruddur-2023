@@ -11,5 +11,7 @@ flask-cors
 # Install Watchtower for Logging
 # watchtower
 # Install Rollbar and Blinker for collecting errors
-rollbar
-blinker
+# rollbar
+# blinker
+
+Flask-AWSCognito
