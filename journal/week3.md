@@ -400,7 +400,7 @@ cognito_jwt_token = CognitoJwtToken(
 )
 ```
 
-Modify the route `/api/activities/home`
+Modify the route `/api/activities/home` in `app.py`
 ```python
 @app.route("/api/activities/home", methods=['GET'])
 def data_home():
