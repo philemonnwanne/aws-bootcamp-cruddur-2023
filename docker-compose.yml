@@ -71,7 +71,7 @@ services:
       
   # Database Service[Postgres]
   # postgres-db:
-  #   image: postgres:alpine
+  #   image: postgres:13-alpine
   #   restart: always
   #   environment:
   #     POSTGRES_USER: "${POSTGRES_USER}"
