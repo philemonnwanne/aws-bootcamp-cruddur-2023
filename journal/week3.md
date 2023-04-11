@@ -1,17 +1,21 @@
 # Week 3 — Decentralized Authentication
 
 ## Setup Cognito
+
 Go to the AWS console and setup an AWS Cognito userpool
 
 ## Install Amplify
+
 While in the frontend directory, run the the following commands
 
 ```bash
 npm install aws-amplify --save
 ```
+
 This will add the `aws-amplify` package as a dependency in the `package.json` file
 
 ## Configure Amplify
+
 Move into the frontend `src` directory
 
 ```bash
@@ -180,7 +184,7 @@ const resend_code = async (event) => {
   }
   ```
 
-  ## Recovery Page
+## Recovery Page
 
   ```js
 import { Auth } from 'aws-amplify';
@@ -401,6 +405,7 @@ cognito_jwt_token = CognitoJwtToken(
 ```
 
 Modify the route `/api/activities/home` in `app.py`
+
 ```python
 @app.route("/api/activities/home", methods=['GET'])
 def data_home():
@@ -417,4 +422,3 @@ def data_home():
     data = HomeActivities.run()
   return data, 200
 ```
-
