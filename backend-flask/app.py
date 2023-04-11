@@ -17,6 +17,9 @@ from services.show_activity import *
 # Cognito Token Verification
 from lib.cognito_jwt_token import CognitoJwtToken, TokenVerifyError, extract_access_token
 
+# JWT Middleware
+# from middleware.middleware import token_required
+
 # Initialize tracing with HoneyComb
 # from opentelemetry import trace
 # from opentelemetry.instrumentation.flask import FlaskInstrumentor
@@ -69,6 +72,12 @@ cognito_jwt_token = CognitoJwtToken(
   user_pool_client_id = os.getenv("AWS_COGNITO_USER_POOL_CLIENT_ID"),
   region = os.getenv("AWS_DEFAULT_REGION")
 )
+
+# Initialize jwt middleware
+# jwt = JWTManager(app)
+# SECRET_KEY = os.environ.get('SECRET_KEY') or 'this is a secret'
+# print(SECRET_KEY)
+# app.config['SECRET_KEY'] = SECRET_KEY
 
 # Initialize automatic instrumentation with Flask
 # FlaskInstrumentor().instrument_app(app)
@@ -190,6 +199,7 @@ def data_create_message():
   return
 
 @app.route("/api/activities/home", methods=['GET'])
+# @token_required
 def data_home():
   access_token = extract_access_token (request.headers)
   try:

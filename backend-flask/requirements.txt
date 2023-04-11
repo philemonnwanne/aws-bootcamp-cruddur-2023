@@ -15,3 +15,4 @@ flask-cors
 # blinker
 
 Flask-AWSCognito
+# pyjwt
