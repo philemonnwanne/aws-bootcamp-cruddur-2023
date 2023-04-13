@@ -18,4 +18,4 @@ else
   URL=$DEV_CONNECTION_URL
 fi
 
-psql $URL cruddur < $schema_path && echo "Database Schema Loaded Successfully"
+psql $URL cruddur < $schema_path && echo "Database Schema Loaded Successfully" 
