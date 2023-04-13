@@ -1,0 +1,21 @@
+# Script compatible with both zsh and bash shells
+#!/usr/bin/env bash
+
+# seed_path="db/seed.sql"
+
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="db-seed"
+printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
+
+seed_path="$(realpath .)/db/seed.sql"
+
+if [ "$1" = "prod" ]; then
+  echo "Running in production!!! mode"
+  URL=$PROD_CONNECTION_URL
+else
+  echo "Running in development!!! mode"
+  URL=$DEV_CONNECTION_URL
+fi
+
+psql $URL cruddur < $seed_path && echo "Database seeded Successfully" 

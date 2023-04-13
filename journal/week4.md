@@ -255,3 +255,95 @@ CREATE TABLE public.activities (
   created_at TIMESTAMP default current_timestamp NOT NULL
 );
 ```
+
+### Connect to the Database
+
+We'll create a new bash script `bin/db-connect` with the following content
+
+```bash
+# Script compatible with both zsh and bash shells
+#!/usr/bin/env bash
+
+if [ "$1" = "prod" ]; then
+  echo "Connected to the Production DATABASE!!!"
+  URL=$PROD_CONNECTION_URL
+else
+  echo "Connected to the Development DATABASE!!!"
+  URL=$DEV_CONNECTION_URL
+fi
+
+psql $URL
+```
+
+We'll make it executable:
+
+```bash
+chmod 744 bin/db-connect
+```
+
+To execute the script:
+
+```bash
+./bin/db-connect
+```
+
+### Seed the Database
+
+We'll create a new bash script `bin/db-seed` with the following content
+
+```bash
+# Script compatible with both zsh and bash shells
+#!/usr/bin/env bash
+
+# seed_path="db/seed.sql"
+
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="db-seed"
+printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
+
+seed_path="$(realpath .)/db/seed.sql"
+
+if [ "$1" = "prod" ]; then
+  echo "Running in production!!! mode"
+  URL=$PROD_CONNECTION_URL
+else
+  echo "Running in development!!! mode"
+  URL=$DEV_CONNECTION_URL
+fi
+
+psql $URL cruddur < $seed_path && echo "Database seeded Successfully" 
+```
+
+#### Add sample data to our DB
+
+We'll create a new file `db/seed.sql` with the following content
+
+```sql
+-- this file was manually created
+INSERT INTO public.users (display_name, handle, cognito_user_id)
+VALUES
+  ('Philemon Nwanne', 'philemonnwanne', 'MOCK'),
+  ('Unknown Variable', 'unknownvariable', 'MOCK');
+
+INSERT INTO public.activities (user_uuid, message, expires_at)
+VALUES
+  (
+    (SELECT uuid from public.users WHERE users.handle = 'philemonnwanne' LIMIT 1),
+    'This was imported as seed data!',
+    current_timestamp + interval '10 day'
+  )
+```
+
+We'll make it executable:
+
+```bash
+chmod 744 bin/db-seed
+```
+
+To execute the script:
+
+```bash
+./bin/db-seed
+```
+
