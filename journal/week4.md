@@ -130,7 +130,7 @@ DROP database cruddur;
 
 ### Import Database Script
 
-We'll create a new SQL file called `schema.sql` and we'll place it in `backend-flask/db`
+We'll create a new SQL file called `schema.sql` and place it in `backend-flask/db`
 
 #### Add UUID Extension
 
@@ -189,3 +189,20 @@ gp env PROD_CONNECTION_URL="postgresql://cruddurroot[:password]@[aws-db-endpoint
 ```
 
 ### Automate Database Workflow
+
+While in the backend directory create the folder `bin` this will hold all the shell scripts for working on our database
+
+create three new files in the `bin` directory
+
+```bash
+touch /bin/db-create \
+      /bin/db-drop \
+      /bin/db-schema-load
+```
+
+Make the files executable
+
+```bash
+chmod 744 bin/*
+```
+ 

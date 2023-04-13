@@ -1,0 +1,8 @@
+# Script compatible with both zsh and bash shells
+#!/usr/bin/env bash
+
+# schema_path="db/schema.sql"
+
+schema_path="$(realpath .)/db/schema.sql"
+
+psql $CONNECTION_URL cruddur < $schema_path && echo "Database Schema Loaded Successfully"
