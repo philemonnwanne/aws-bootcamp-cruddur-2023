@@ -155,17 +155,23 @@ psql cruddur < db/schema.sql -h localhost -U postgres
 
 To enable a `passwordless` login to postgres export the following env variable
 
+#### Connection url format for postgres
+
 ```bash
-export CONNECTION_URL="postgresql://postgres:postgres@127.0.0.1:5432/cruddur"
+postgresql://[user[:password]@][netloc][:port][/dbname][?param1=value1&...]
+```
+
+```bash
+export CONNECTION_URL="postgresql://postgres[:password]@127.0.0.1:5432/cruddur"
 ```
 
 For `gitpod` environments use
 
 ```bash
-gp env CONNECTION_URL="postgresql://postgres:postgres@127.0.0.1:5432/cruddur"
+gp env CONNECTION_URL="postgresql://postgres[:password]@127.0.0.1:5432/cruddur"
 ```
 
-Then run `psql $CONNECTION_URL` to login without a password
+Remember to pass the right username, password, host etc. Then run `psql $CONNECTION_URL` to login without a password
 
 
 #### Production(RDS) Connection URL
@@ -173,13 +179,13 @@ Then run `psql $CONNECTION_URL` to login without a password
 Locally
 
 ```bash
-export PROD_CONNECTION_URL="postgresql://cruddurroot:cruddur@cruddur-db-instance.cjypss68576q.us-east-1.rds.amazonaws.com:5432/cruddur"
+export PROD_CONNECTION_URL="postgresql://cruddurroot[:password]@[aws-db-endpoint]:5432/cruddur"
 ```
 
 For `gitpod` environments use
 
 ```bash
-gp env PROD_CONNECTION_URL="postgresql://cruddurroot:cruddur@cruddur-db-instance.cjypss68576q.us-east-1.rds.amazonaws.com:5432/cruddur"
+gp env PROD_CONNECTION_URL="postgresql://cruddurroot[:password]@[aws-db-endpoint]:5432/cruddur"
 ```
 
 ### Automate Database Workflow
