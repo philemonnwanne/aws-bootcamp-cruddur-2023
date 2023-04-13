@@ -206,3 +206,13 @@ Make the files executable
 chmod 744 bin/*
 ```
  
+### Update Bash scripts for Prod & Dev Mode
+
+```bash
+if [ "$1" = "prod" ]; then
+  echo "Running in production!!! mode"
+else
+  echo "Running in development!!! mode"
+fi
+```
+

@@ -1,6 +1,6 @@
 # Script compatible with both zsh and bash shells
 #!/usr/bin/env bash
 
-NO_DB_CONNECTION_URL=$(sed 's/\/cruddur//g' <<< "$CONNECTION_URL")
+NO_DB_CONNECTION_URL=$(sed 's/\/cruddur//g' <<< "$DEV_CONNECTION_URL")
 
 psql $NO_DB_CONNECTION_URL -c "DROP DATABASE cruddur;" && echo "Database Deleted Successfully"

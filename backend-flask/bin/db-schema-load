@@ -5,4 +5,12 @@
 
 schema_path="$(realpath .)/db/schema.sql"
 
-psql $CONNECTION_URL cruddur < $schema_path && echo "Database Schema Loaded Successfully"
+if [ "$1" = "prod" ]; then
+  echo "Running in production!!! mode"
+  URL=$PROD_CONNECTION_URL
+else
+  echo "Running in development!!! mode"
+  URL=$DEV_CONNECTION_URL
+fi
+
+psql $URL cruddur < $schema_path && echo "Database Schema Loaded Successfully"
