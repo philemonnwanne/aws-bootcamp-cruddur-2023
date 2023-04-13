@@ -3,6 +3,11 @@
 
 # schema_path="db/schema.sql"
 
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="db-schema-load"
+printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
+
 schema_path="$(realpath .)/db/schema.sql"
 
 if [ "$1" = "prod" ]; then
