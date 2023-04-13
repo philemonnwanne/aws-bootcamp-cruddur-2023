@@ -70,17 +70,17 @@ services:
   #     - ${APP_NAME}-network
       
   # Database Service[Postgres]
-  # postgres-db:
-  #   image: postgres:13-alpine
-  #   restart: always
-  #   environment:
-  #     POSTGRES_USER: "${POSTGRES_USER}"
-  #     POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-  #   container_name: postgres-db
-  #   ports:
-  #     - '5432:5432'
-  #   volumes:
-  #     - db:/var/lib/postgresql/data
+  postgres-db:
+    image: postgres:13-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    container_name: postgres-db
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
 
   # Database Service[dynamodb_local]
   # dynamodb-local:
@@ -99,6 +99,6 @@ networks:
     driver: bridge
 
 # Docker Volumes
-# volumes:
-#   db:
-#     driver: local
+volumes:
+  db:
+    driver: local

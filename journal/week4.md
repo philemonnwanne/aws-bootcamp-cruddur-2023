@@ -81,3 +81,105 @@ If the above command is successful you will get a similar `json` ouput
     }
 }
 ```
+
+To connect to a local postgres db
+
+```bash
+psql -U postgress --host localhost
+```
+
+### Create Database
+
+There are a few ways to create a database, some of which are
+
+
+Using the command line
+
+```bash
+createdb cruddur -h localhost -U postgres
+```
+
+Accessing the postgres container and using an underlying SQL command
+
+```bash
+psql -U postgress --host localhost
+```
+
+```bash
+CREATE database cruddur;
+```
+
+### Delete Database
+
+
+Using the command line
+
+```bash
+dropdb cruddur -h localhost -U postgres
+```
+
+Accessing the postgres container and using an underlying SQL command
+
+```bash
+psql -U postgress --host localhost
+```
+
+```bash
+DROP database cruddur;
+```
+
+### Import Database Script
+
+We'll create a new SQL file called `schema.sql` and we'll place it in `backend-flask/db`
+
+#### Add UUID Extension
+
+We are going to have Postgres generate out `UUIDs`. We'll need to use an extension called:
+
+```sql
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+```
+
+Add this to the `schema.sql` file
+
+### The command to import
+
+Make sure you are in the `backend` directory before running this
+
+```bash
+psql cruddur < db/schema.sql -h localhost -U postgres
+```
+
+
+### Passwordless Login
+
+To enable a `passwordless` login to postgres export the following env variable
+
+```bash
+export CONNECTION_URL="postgresql://postgres:postgres@127.0.0.1:5432/cruddur"
+```
+
+For `gitpod` environments use
+
+```bash
+gp env CONNECTION_URL="postgresql://postgres:postgres@127.0.0.1:5432/cruddur"
+```
+
+Then run `psql $CONNECTION_URL` to login without a password
+
+
+#### Production(RDS) Connection URL
+
+Locally
+
+```bash
+export PROD_CONNECTION_URL="postgresql://cruddurroot:cruddur@cruddur-db-instance.cjypss68576q.us-east-1.rds.amazonaws.com:5432/cruddur"
+```
+
+For `gitpod` environments use
+
+```bash
+gp env PROD_CONNECTION_URL="postgresql://cruddurroot:cruddur@cruddur-db-instance.cjypss68576q.us-east-1.rds.amazonaws.com:5432/cruddur"
+```
+
+### Automate Database Workflow
