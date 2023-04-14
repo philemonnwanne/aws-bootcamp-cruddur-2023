@@ -157,19 +157,19 @@ To enable a `passwordless` login to postgres export the following env variable
 Sample `connection url format` for postgres
 
 ```bash
-postgresql://[user[:password]@][netloc][:port][/dbname][?param1=value1&...]
+postgresql://[user:[password]@][netloc]:[port][/dbname][?param1=value1&...]
 ```
 
 For `local` environment
 
 ```bash
-export CONNECTION_URL="postgresql://postgres[:password]@127.0.0.1:5432/cruddur"
+export CONNECTION_URL="postgresql://postgres:[password]@127.0.0.1:5432/cruddur"
 ```
 
 For `gitpod` environment
 
 ```bash
-gp env CONNECTION_URL="postgresql://postgres[:password]@127.0.0.1:5432/cruddur"
+gp env CONNECTION_URL="postgresql://postgres:[password]@127.0.0.1:5432/cruddur"
 ```
 
 `Note:` Remember to pass the right username, password, host etc. Then run `psql $CONNECTION_URL` to login without a password
@@ -180,13 +180,17 @@ gp env CONNECTION_URL="postgresql://postgres[:password]@127.0.0.1:5432/cruddur"
 For `local` environment
 
 ```bash
-export PROD_CONNECTION_URL="postgresql://cruddurroot[:password]@[aws-db-endpoint]:5432/cruddur"
+export PROD_CONNECTION_URL="postgresql://cruddurroot:[password]@[aws-db-endpoint]:5432/cruddur"
 ```
 
 For `gitpod` environment
 
 ```bash
-gp env PROD_CONNECTION_URL="postgresql://cruddurroot[:password]@[aws-db-endpoint]:5432/cruddur"
+export PROD_CONNECTION_URL="postgresql://cruddurroot:[password]@[aws-db-endpoint]:5432/cruddur"
+```
+
+```bash
+gp env PROD_CONNECTION_URL="postgresql://cruddurroot:[password]@[aws-db-endpoint]:5432/cruddur"
 ```
 
 ## Automate Database Workflow
@@ -472,7 +476,7 @@ connection_url = os.getenv("CONNECTION_URL")
 pool = ConnectionPool(connection_url)
 ```
 
-We need to set the env var for our backend-flask application:
+We need to set the `env var` for our backend-flask application
 
 ```yaml
   backend-flask:
