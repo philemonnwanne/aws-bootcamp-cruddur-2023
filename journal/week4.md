@@ -313,7 +313,7 @@ VALUES
 
 ### Seed the Database
 
-We'll create a new bash script `bin/db-seed` with the following content
+We'll create a new script `bin/db-seed` with the following content
 
 ```bash
 # Script compatible with both zsh and bash shells
@@ -354,7 +354,7 @@ To execute the script:
 
 ### See what connections we are using
 
-We'll create a new file `bin/db-sessions` with the following content
+We'll create a new script `bin/db-sessions` with the following content
 
 ```bash
 # Script compatible with both zsh and bash shells
@@ -393,4 +393,38 @@ To execute the script:
 
 ```bash
 ./bin/db-sessions
+```
+
+### Automate database setup (for local dev only ⚠️❗️)
+
+We'll create a new script `bin/db-setup` with the following content
+
+```bash
+# Script compatible with both zsh and bash shells
+#!/usr/bin/env bash
+-e # stop if it fails at any point
+
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="db-setup"
+printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
+
+bin_path="$(realpath .)/bin"
+
+source "$bin_path/db-drop"
+source "$bin_path/db-create"
+source "$bin_path/db-schema-load"
+source "$bin_path/db-seed"
+```
+
+We'll make it executable:
+
+```bash
+chmod 744 bin/db-setup
+```
+
+To execute the script:
+
+```bash
+./bin/db-setup
 ```
