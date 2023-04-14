@@ -219,7 +219,7 @@ fi
 
 ### Make Prints Nicer
 
-We we can make prints for our shell scripts coloured so we can see what we're doing
+We can make prints for our shell scripts coloured so we can see what we're doing
 
 [how-to-change-the-output-color-of-echo-in-linux](https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux)
 
