@@ -105,7 +105,7 @@ Accessing the postgres container and running an underlying SQL command
 psql -U postgress --host localhost
 ```
 
-```bash
+```sql
 CREATE DATABASE cruddur;
 ```
 
@@ -124,7 +124,7 @@ Accessing the postgres container and running an underlying SQL command
 psql -U postgress --host localhost
 ```
 
-```bash
+```sql
 DROP DATABASE cruddur;
 ```
 
@@ -207,7 +207,7 @@ Make the files executable
 chmod 744 bin/*
 ```
  
-### Update Bash scripts for Prod & Dev Mode
+### Update Bash scripts for Prod & Dev Env
 
 ```bash
 if [ "$1" = "prod" ]; then
