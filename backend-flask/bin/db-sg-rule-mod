@@ -1,0 +1,24 @@
+# Script compatible with both zsh and bash shells
+#!/usr/bin/env bash
+
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="db-sg-rule-mod"
+printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
+
+export OS1=$(lsb_release -is 2>/dev/null)
+export OS2=$(sw_vers --productName 2>/dev/null)
+
+if [ "$OS1" = "Linux" ]; then
+  echo "This is a ${OS1} environment!!!"
+  export GITPOD_IP=$(curl ifconfig.me)
+  EXT_IP=$GITPOD_IP
+else
+  echo "This is a ${OS2} environment!!!"
+  export MACHINE_IP=$(curl -s http://ipecho.net/plain; echo)
+  EXT_IP=$MACHINE_IP
+fi
+
+aws ec2 modify-security-group-rules \
+    --group-id $DB_SG_ID \
+    --security-group-rules "SecurityGroupRuleId=$DB_SG_RULE_ID,SecurityGroupRule={IpProtocol=tcp,FromPort=5432,ToPort=5432,CidrIpv4=$EXT_IP/32,Description=RDS_Access_Phil}"

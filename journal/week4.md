@@ -547,3 +547,86 @@ class HomeActivities:
     return json [0]
     # span.set_attribute("app.result_length", len(results))
 ```
+
+### Connect to RDS via Gitpod
+
+In order to connect to the RDS instance we need to provide our Gitpod IP and whitelist for inbound traffic on port `5432`.
+
+```bash
+GITPOD_IP=$(curl ifconfig.me)
+```
+
+We'll create an inbound rule for Postgres `(5432)` and provide the `GITPOD ID`.
+
+We'll get the security group `rule id` so we can easily modify it in the future from the terminal here in Gitpod.
+
+For gitpod environment
+
+```bash
+export DB_SG_ID="sg-xxxxxxxx"
+gp env DB_SG_ID="sg-xxxxxxxx"
+
+export DB_SG_RULE_ID="sgr-xxxxxxxx"
+gp env DB_SG_RULE_ID="sgr-xxxxxxxx"
+```
+
+Whenever we need to update our security groups we can do this for access.
+
+```bash
+aws ec2 modify-security-group-rules \
+    --group-id $DB_SG_ID \
+    --security-group-rules "SecurityGroupRuleId=$DB_SG_RULE_ID,SecurityGroupRule={IpProtocol=tcp,FromPort=5432,ToPort=5432,CidrIpv4=$GITPOD_IP/32,Description=RDS_Access_Phil}"
+```
+
+[modify-security-group-rules-aws](https://docs.aws.amazon.com/cli/latest/reference/ec2/modify-security-group-rules.html#examples)
+
+To automate the process above
+
+Then we will create a new script `bin/db-sg-rule-mod` with the following content
+
+```bash
+# Script compatible with both zsh and bash shells
+# Auto detect OS and apply configurations based on returned data
+#!/usr/bin/env bash
+
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="db-sg-rule-mod"
+printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
+
+export OS1=$(lsb_release -is 2>/dev/null)
+export OS2=$(sw_vers --productName 2>/dev/null)
+
+if [ "$OS1" = "Linux" ]; then
+  echo "This is a ${OS1} environment!!!"
+  export GITPOD_IP=$(curl ifconfig.me)
+  EXT_IP=$GITPOD_IP
+else
+  echo "This is a ${OS2} environment!!!"
+  export MACHINE_IP=$(curl -s http://ipecho.net/plain; echo)
+  EXT_IP=$MACHINE_IP
+fi
+
+aws ec2 modify-security-group-rules \
+    --group-id $DB_SG_ID \
+    --security-group-rules "SecurityGroupRuleId=$DB_SG_RULE_ID,SecurityGroupRule={IpProtocol=tcp,FromPort=5432,ToPort=5432,CidrIpv4=$EXT_IP/32,Description=RDS_Access_Phil}"
+```
+
+Remember to export the following `env vars`
+
+```bash
+DB_SG_ID
+DB_SG_RULE_ID
+```
+
+We will make it executable:
+
+```bash
+chmod 744 bin/db-sg-rule-mod
+```
+
+To execute the script:
+
+```bash
+./bin/db-sg-rule-mod
+```
