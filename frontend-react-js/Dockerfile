@@ -8,11 +8,11 @@ COPY --chown=node:node ./*.json .
 ENV NODE_ENV=production
 
 RUN npm install --save \
-        @opentelemetry/api \
-        @opentelemetry/sdk-trace-web \
-        @opentelemetry/exporter-trace-otlp-http \
-        @opentelemetry/context-zone \
-        @opentelemetry/instrumentation \
+        # @opentelemetry/api \
+        # @opentelemetry/sdk-trace-web \
+        # @opentelemetry/exporter-trace-otlp-http \
+        # @opentelemetry/context-zone \
+        # @opentelemetry/instrumentation \
         aws-amplify
 
 # production image
