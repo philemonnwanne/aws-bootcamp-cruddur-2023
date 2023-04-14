@@ -18,7 +18,7 @@ tasks:
       sudo apt install -y postgresql-client-13 libpq-dev
   
   - name: update-rds-secgrp-IP
-    command: |
+    init: |
       export GITPOD_IP=$(curl ifconfig.me)
       source "$THEIA_WORKSPACE_ROOT/backend-flask/bin/db-sg-rule-mod"
 
