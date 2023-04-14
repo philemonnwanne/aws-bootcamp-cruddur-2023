@@ -20,7 +20,7 @@ tasks:
   - name: update-rds-secgrp-IP
     command: |
       export GITPOD_IP=$(curl ifconfig.me)
-      source "$THEIA_WORKSPACE_ROOT/backend-flask/db-sg-rule-mod"
+      source "$THEIA_WORKSPACE_ROOT/backend-flask/bin/db-sg-rule-mod"
 
   - name: mod-init-script
     command: |

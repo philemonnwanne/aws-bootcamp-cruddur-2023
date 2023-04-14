@@ -639,5 +639,5 @@ We'll add a command step to update rds secgrp IP on env var change
 - name: update-rds-secgrp-IP
   command: |
     export GITPOD_IP=$(curl ifconfig.me)
-    source "$THEIA_WORKSPACE_ROOT/backend-flask/db-update-sg-rule"
+    source "$THEIA_WORKSPACE_ROOT/backend-flask/bin/db-update-sg-rule"
 ```
