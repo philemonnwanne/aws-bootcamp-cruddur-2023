@@ -630,3 +630,13 @@ To execute the script:
 ```bash
 ./bin/db-sg-rule-mod
 ```
+
+### Update Gitpod IP on new env var
+
+We'll add a command step for postgres
+
+```yaml
+command: |
+  export GITPOD_IP=$(curl ifconfig.me)
+  source "$THEIA_WORKSPACE_ROOT/backend-flask/db-update-sg-rule"
+```
