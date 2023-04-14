@@ -597,7 +597,7 @@ printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 export OS1=$(lsb_release -is 2>/dev/null)
 export OS2=$(sw_vers --productName 2>/dev/null)
 
-if [ "$OS1" = "Linux" ]; then
+if [ "$OS1" = "Ubuntu" ]; then
   echo "This is a ${OS1} environment!!!"
   export GITPOD_IP=$(curl ifconfig.me)
   EXT_IP=$GITPOD_IP
@@ -633,7 +633,7 @@ To execute the script:
 
 ### Update Gitpod IP on new env var
 
-We'll add a command step for postgres
+We'll add a command step to update rds secgrp IP on env var change
 
 ```yaml
 command: |
