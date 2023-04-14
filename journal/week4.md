@@ -99,14 +99,14 @@ Using the command line
 createdb cruddur -h localhost -U postgres
 ```
 
-Accessing the postgres container and using an underlying SQL command
+Accessing the postgres container and running an underlying SQL command
 
 ```bash
 psql -U postgress --host localhost
 ```
 
 ```bash
-CREATE database cruddur;
+CREATE DATABASE cruddur;
 ```
 
 ### Delete Database
@@ -118,25 +118,25 @@ Using the command line
 dropdb cruddur -h localhost -U postgres
 ```
 
-Accessing the postgres container and using an underlying SQL command
+Accessing the postgres container and running an underlying SQL command
 
 ```bash
 psql -U postgress --host localhost
 ```
 
 ```bash
-DROP database cruddur;
+DROP DATABASE cruddur;
 ```
 
 ### Import Database Script
 
 We'll create a new SQL file called `schema.sql` and place it in `backend-flask/db`
 
-#### Add UUID Extension
+#### add UUID extension
 
-We are going to have Postgres generate out `UUIDs`. We'll need to use an extension called:
+We are going to have postgres generate `UUIDs`. We'll need to use an extension called: `uuid-ossp`
 
-Add this to the `schema.sql` file
+Add this 👇🏾 to the `schema.sql` file
 
 ```sql
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -150,7 +150,6 @@ Make sure you are in the `backend` directory before running this
 psql cruddur < db/schema.sql -h localhost -U postgres
 ```
 
-
 ### Passwordless Login
 
 To enable a `passwordless` login to postgres export the following env variable
@@ -161,7 +160,7 @@ Sample `connection url format` for postgres
 postgresql://[user[:password]@][netloc][:port][/dbname][?param1=value1&...]
 ```
 
-For local environment
+For `local` environment
 
 ```bash
 export CONNECTION_URL="postgresql://postgres[:password]@127.0.0.1:5432/cruddur"
@@ -178,7 +177,7 @@ gp env CONNECTION_URL="postgresql://postgres[:password]@127.0.0.1:5432/cruddur"
 
 `Production(RDS)` connection url fromat
 
-For local environment
+For `local` environment
 
 ```bash
 export PROD_CONNECTION_URL="postgresql://cruddurroot[:password]@[aws-db-endpoint]:5432/cruddur"
@@ -190,7 +189,7 @@ For `gitpod` environment
 gp env PROD_CONNECTION_URL="postgresql://cruddurroot[:password]@[aws-db-endpoint]:5432/cruddur"
 ```
 
-### Automate Database Workflow
+## Automate Database Workflow
 
 While in the backend directory create the folder `bin` this will hold all the shell scripts for working on our database
 
@@ -395,7 +394,7 @@ To execute the script:
 ./bin/db-sessions
 ```
 
-### Automate database setup (for local dev only ⚠️❗️)
+### Automate database setup (for local... dev mode only ⚠️❗️)
 
 We'll create a new script `bin/db-setup` with the following content
 
