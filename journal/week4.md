@@ -232,7 +232,7 @@ printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 
 ### Create/Delete Tables
 
-Add this to the `schema.sql` file
+Add this 👇🏾 to the `schema.sql` file
 
 ```sql
 DROP TABLE IF EXISTS public.users;
