@@ -175,7 +175,7 @@ gp env CONNECTION_URL="postgresql://postgres[:password]@127.0.0.1:5432/cruddur"
 `Note:` Remember to pass the right username, password, host etc. Then run `psql $CONNECTION_URL` to login without a password
 
 
-`Production(RDS)` connection url fromat
+### `Production(RDS)` connection url fromat
 
 For `local` environment
 
