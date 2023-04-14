@@ -12,9 +12,8 @@ services:
       REACT_APP_AWS_COGNITO_REGION: "${AWS_DEFAULT_REGION}"
       REACT_APP_AWS_USER_POOLS_ID: "${AWS_COGNITO_USER_POOL_ID}"
       REACT_APP_CLIENT_ID: "${AWS_COGNITO_USER_POOL_CLIENT_ID}"
-
     build: ./frontend-react-js
-    container_name: ${APP_NAME}_frontend
+    container_name: ${APP_NAME}-frontend
     ports:
       - "3000:3000"
     healthcheck:
@@ -32,6 +31,7 @@ services:
   # Backend Service
   backend:
     environment:
+      CONNECTION_URL: "${DEV_CONNECTION_URL}"
       FRONTEND_URL: "https://3000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
       BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
       OTEL_EXPORTER_OTLP_ENDPOINT: "https://api.honeycomb.io/"
@@ -46,7 +46,7 @@ services:
       AWS_COGNITO_USER_POOL_ID: "${AWS_COGNITO_USER_POOL_ID}"
       AWS_COGNITO_USER_POOL_CLIENT_ID: "${AWS_COGNITO_USER_POOL_CLIENT_ID}"
     build: ./backend-flask
-    container_name: ${APP_NAME}_backend
+    container_name: ${APP_NAME}-backend
     ports:
       - "4567:4567"
     volumes:
@@ -81,6 +81,8 @@ services:
       - '5432:5432'
     volumes:
       - db:/var/lib/postgresql/data
+    networks:
+      - ${APP_NAME}-network
 
   # Database Service[dynamodb_local]
   # dynamodb-local:

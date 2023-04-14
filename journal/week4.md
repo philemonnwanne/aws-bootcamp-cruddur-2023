@@ -130,11 +130,11 @@ DROP DATABASE cruddur;
 
 ### Import Database Script
 
-We'll create a new SQL file called `schema.sql` and place it in `backend-flask/db`
+We will create a new SQL file called `schema.sql` and place it in `backend-flask/db`
 
 #### add UUID extension
 
-We are going to have postgres generate `UUIDs`. We'll need to use an extension called: `uuid-ossp`
+We are going to have postgres generate `UUIDs`. We will need to use an extension called: `uuid-ossp`
 
 Add this 👇🏾 to the `schema.sql` file
 
@@ -261,7 +261,7 @@ CREATE TABLE public.activities (
 
 ### Connect to the Database
 
-We'll create a new bash script `bin/db-connect` with the following content
+We will create a new bash script `bin/db-connect` with the following content
 
 ```bash
 # Script compatible with both zsh and bash shells
@@ -278,7 +278,7 @@ fi
 psql $URL
 ```
 
-We'll make it executable:
+We will make it executable:
 
 ```bash
 chmod 744 bin/db-connect
@@ -292,7 +292,7 @@ To execute the script:
 
 ### Add sample data to our Database
 
-We'll create a new file `db/seed.sql` with the following content
+We will create a new file `db/seed.sql` with the following content
 
 ```sql
 -- this file was manually created
@@ -312,7 +312,7 @@ VALUES
 
 ### Seed the Database
 
-We'll create a new script `bin/db-seed` with the following content
+We will create a new script `bin/db-seed` with the following content
 
 ```bash
 # Script compatible with both zsh and bash shells
@@ -338,7 +338,7 @@ fi
 psql $URL cruddur < $seed_path && echo "Database seeded Successfully" 
 ```
 
-We'll make it executable:
+We will make it executable:
 
 ```bash
 chmod 744 bin/db-seed
@@ -353,7 +353,7 @@ To execute the script:
 
 ### See what connections we are using
 
-We'll create a new script `bin/db-sessions` with the following content
+We will create a new script `bin/db-sessions` with the following content
 
 ```bash
 # Script compatible with both zsh and bash shells
@@ -382,7 +382,7 @@ psql $NO_DB_URL -c "select pid as process_id, \
 from pg_stat_activity;"
 ```
 
-We'll make it executable:
+We will make it executable:
 
 ```bash
 chmod 744 bin/db-sessions
@@ -396,7 +396,7 @@ To execute the script:
 
 ### Automate database setup (for local... dev mode only ⚠️❗️)
 
-We'll create a new script `bin/db-setup` with the following content
+We will create a new script `bin/db-setup` with the following content
 
 ```bash
 # Script compatible with both zsh and bash shells
@@ -416,7 +416,7 @@ source "$bin_path/db-schema-load"
 source "$bin_path/db-seed"
 ```
 
-We'll make it executable:
+We will make it executable:
 
 ```bash
 chmod 744 bin/db-setup
@@ -426,4 +426,85 @@ To execute the script:
 
 ```bash
 ./bin/db-setup
+```
+
+### Install Postgres Driver
+
+We will add the following to our `requirements.txt`
+
+```txt
+...
+psycopg[binary]
+psycopg[pool]
+```
+
+Now run
+
+```bash
+pip install -r requirements.txt
+```
+
+### DB Object and Connection Pool
+
+We will create a new file `lib/db.py` with the following content
+
+```python
+from psycopg_pool import ConnectionPool
+import os # to load env vars
+
+connection_url = os.getenv("DEV_CONNECTION_URL")
+pool = ConnectionPool(connection_url)
+```
+
+We need to set the env var for our backend-flask application:
+
+```yaml
+  backend-flask:
+    environment:
+      CONNECTION_URL: "${DEV_CONNECTION_URL}"
+```
+
+### Run a query in Home Activities
+
+Add the following to `home_activities.py`
+
+```python
+from lib.db import pool
+```
+
+In our home activities we will replace our mock endpoint with real api call
+
+```python
+with pool.connection() as conn:
+    with conn.cursor() as cur:
+        cur.execute(sql)
+        # this will return a tuple
+        # the first field being the data
+        json = cur.fetchall()
+return json[0]
+```
+
+The new `home_activities.py` should now look like this 👇🏾
+
+```python
+from datetime import datetime, timedelta, timezone
+# from opentelemetry import trace
+from lib.db import pool
+
+# tracer = trace.get_tracer("home_activities")
+
+class HomeActivities:
+  def run(cognito_user_id=None):
+    now = datetime.now(timezone.utc).astimezone()
+
+    sql = """
+    SELECT * FROM activities
+    """
+    with pool.connection() as conn:
+      with conn.cursor() as cur:
+        cur.execute(sql)
+        # this will return a tuple
+        # the first field being the data
+        json = cur.fetchall()
+    return json[0]
 ```

@@ -16,3 +16,7 @@ flask-cors
 
 Flask-AWSCognito
 # pyjwt
+
+# add postgres driver for python
+psycopg[binary]
+psycopg[pool]
