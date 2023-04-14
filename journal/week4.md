@@ -136,13 +136,13 @@ We'll create a new SQL file called `schema.sql` and place it in `backend-flask/d
 
 We are going to have Postgres generate out `UUIDs`. We'll need to use an extension called:
 
+Add this to the `schema.sql` file
+
 ```sql
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 ```
 
-Add this to the `schema.sql` file
-
-### The command to import
+### Import database schema
 
 Make sure you are in the `backend` directory before running this
 
@@ -155,34 +155,36 @@ psql cruddur < db/schema.sql -h localhost -U postgres
 
 To enable a `passwordless` login to postgres export the following env variable
 
-#### Connection url format for postgres
+Sample `connection url format` for postgres
 
 ```bash
 postgresql://[user[:password]@][netloc][:port][/dbname][?param1=value1&...]
 ```
 
+For local environment
+
 ```bash
 export CONNECTION_URL="postgresql://postgres[:password]@127.0.0.1:5432/cruddur"
 ```
 
-For `gitpod` environments use
+For `gitpod` environment
 
 ```bash
 gp env CONNECTION_URL="postgresql://postgres[:password]@127.0.0.1:5432/cruddur"
 ```
 
-Remember to pass the right username, password, host etc. Then run `psql $CONNECTION_URL` to login without a password
+`Note:` Remember to pass the right username, password, host etc. Then run `psql $CONNECTION_URL` to login without a password
 
 
-#### Production(RDS) Connection URL
+`Production(RDS)` connection url fromat
 
-Locally
+For local environment
 
 ```bash
 export PROD_CONNECTION_URL="postgresql://cruddurroot[:password]@[aws-db-endpoint]:5432/cruddur"
 ```
 
-For `gitpod` environments use
+For `gitpod` environment
 
 ```bash
 gp env PROD_CONNECTION_URL="postgresql://cruddurroot[:password]@[aws-db-endpoint]:5432/cruddur"
@@ -230,6 +232,8 @@ printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 ```
 
 ### Create/Delete Tables
+
+Add this to the `schema.sql` file
 
 ```sql
 DROP TABLE IF EXISTS public.users;
@@ -287,6 +291,26 @@ To execute the script:
 ./bin/db-connect
 ```
 
+### Add sample data to our Database
+
+We'll create a new file `db/seed.sql` with the following content
+
+```sql
+-- this file was manually created
+INSERT INTO public.users (display_name, handle, cognito_user_id)
+VALUES
+  ('Philemon Nwanne', 'philemonnwanne', 'MOCK'),
+  ('Unknown Variable', 'unknownvariable', 'MOCK');
+
+INSERT INTO public.activities (user_uuid, message, expires_at)
+VALUES
+  (
+    (SELECT uuid from public.users WHERE users.handle = 'philemonnwanne' LIMIT 1),
+    'This was imported as seed data!',
+    current_timestamp + interval '10 day'
+  )
+```
+
 ### Seed the Database
 
 We'll create a new bash script `bin/db-seed` with the following content
@@ -315,26 +339,6 @@ fi
 psql $URL cruddur < $seed_path && echo "Database seeded Successfully" 
 ```
 
-#### Add sample data to our DB
-
-We'll create a new file `db/seed.sql` with the following content
-
-```sql
--- this file was manually created
-INSERT INTO public.users (display_name, handle, cognito_user_id)
-VALUES
-  ('Philemon Nwanne', 'philemonnwanne', 'MOCK'),
-  ('Unknown Variable', 'unknownvariable', 'MOCK');
-
-INSERT INTO public.activities (user_uuid, message, expires_at)
-VALUES
-  (
-    (SELECT uuid from public.users WHERE users.handle = 'philemonnwanne' LIMIT 1),
-    'This was imported as seed data!',
-    current_timestamp + interval '10 day'
-  )
-```
-
 We'll make it executable:
 
 ```bash
@@ -347,3 +351,46 @@ To execute the script:
 ./bin/db-seed
 ```
 
+
+### See what connections we are using
+
+We'll create a new file `bin/db-sessions` with the following content
+
+```bash
+# Script compatible with both zsh and bash shells
+#!/usr/bin/env bash
+
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="db-session"
+printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
+
+if [ "$1" = "prod" ]; then
+  echo "Running in production!!! mode"
+  URL=$PROD_CONNECTION_URL
+else 
+  echo "Running in development!!! mode"
+  URL=$DEV_CONNECTION_URL
+fi
+
+NO_DB_URL=$(sed 's/\/cruddur//g' <<< "$URL")
+psql $NO_DB_URL -c "select pid as process_id, \
+       usename as user,  \
+       datname as db, \
+       client_addr, \
+       application_name as app,\
+       state \
+from pg_stat_activity;"
+```
+
+We'll make it executable:
+
+```bash
+chmod 744 bin/db-sessions
+```
+
+To execute the script:
+
+```bash
+./bin/db-sessions
+```
