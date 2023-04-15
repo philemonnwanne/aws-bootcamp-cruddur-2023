@@ -763,7 +763,10 @@ Alternatively you can create your own development layer by downloading the psyco
 
 Follow the instructions on `https://github.com/AbhimanyuHK/aws-psycopg2` to compile your own layer from postgres source libraries for the desired version.
 
+### Add the function to Cognito
 
-### Add the function to Cognito 
-
-Under the user pool properties add the function as a `Post Confirmation` lambda trigger
+- Click on your user pool in the cognito console
+- Under the `user pool properties` click on `Add Lambda trigger`
+- Choose Sign-up then then `Add Lambda trigger`
+- In the `Assign Lambda function` dropdown, select the post confirmation lambda function created earlier
+- Then click `Add Lambda trigger`
