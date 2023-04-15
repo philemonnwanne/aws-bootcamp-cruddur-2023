@@ -663,10 +663,10 @@ In the `schema.sql` file, add the email parameter to the users table.
 ```sql
 CREATE TABLE public.users (
   uuid UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  display_name text,
-  handle text,
-  email text, -- insert this line
-  cognito_user_id text,
+  display_name text NOT NULL,
+  handle text NOT NULL,
+  email text NOT NULL, -- insert this line
+  cognito_user_id text NOT NULL,
   created_at TIMESTAMP default current_timestamp NOT NULL
 );
 ```
@@ -688,7 +688,7 @@ PG_PASSWORD=''
 The function
 
 ```python
-import json, os
+import os
 import psycopg2
 
 def lambda_handler(event, context):
@@ -701,25 +701,24 @@ def lambda_handler(event, context):
     user_handle           = user['preferred_username']
     user_cognito_id       = user['sub']
     try:
-        conn = psycopg2.connect(os.getenv('CONNECTION_URL'))
-        cur = conn.cursor()
-
-        sql = f"""
-          "INSERT INTO users (
-          display_name,
-          email,
-          handle, 
-          cognito_user_id
-          )
-          VALUES(
-            {user_display_name}, 
-            {user_email},
-            {user_handle},
-            {user_cognito_id}
-          )"
-        """
-        cur.execute(sql)
-        conn.commit() 
+      sql = f"""
+        INSERT INTO  public.users (
+        display_name,
+        email,
+        handle, 
+        cognito_user_id
+        )
+        VALUES (
+          {user_display_name}, 
+          {user_email},
+          {user_handle},
+          {user_cognito_id}
+        )
+      """
+      conn = psycopg2.connect(os.getenv('CONNECTION_URL'))
+      cur = conn.cursor()
+      cur.execute(sql)
+      conn.commit() 
 
     except (Exception, psycopg2.DatabaseError) as error:
       print(error)
@@ -728,7 +727,7 @@ def lambda_handler(event, context):
         cur.close()
         conn.close()
         print('Database connection closed.')
-
+            
     return event
 ```
 
