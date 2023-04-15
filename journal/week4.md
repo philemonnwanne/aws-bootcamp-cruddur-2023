@@ -290,13 +290,13 @@ printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 
 if [ "$1" = "prod" ]; then
   URL=$PROD_CONNECTION_URL
-  echo "Connected to the Production DATABASE!!!"
+  echo "Connecting to the production DATABASE!!!"
+  psql $URL && echo "Bye Bye from the production DATABASE!!!"
 else
   URL=$DEV_CONNECTION_URL
-  echo "Connected to the Development DATABASE!!!"
+  echo "Connecting to the development DATABASE!!!"
+  psql $URL && echo "Bye Bye from the development DATABASE!!!"
 fi
-
-psql $URL
 ```
 
 We will make it executable:
