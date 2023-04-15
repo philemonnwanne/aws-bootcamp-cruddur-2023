@@ -1,4 +1,16 @@
+<p align=right> 
+<a href="https://gitpod.io/#https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023">
+  <img
+    src="https://img.shields.io/badge/Contribute%20with-Gitpod-908a85?logo=gitpod"
+    alt="Contribute with Gitpod"
+    style="text-align: right"
+  />
+</a>
+</p>
+
 # Week 4 — Postgres and RDS
+
+## Required Homework/Tasks
 
 ## Provision an RDS Instance
 
@@ -641,3 +653,117 @@ We'll add a command step to update rds secgrp IP on env var change
     export GITPOD_IP=$(curl ifconfig.me)
     source "$THEIA_WORKSPACE_ROOT/backend-flask/bin/db-update-sg-rule"
 ```
+
+### Setup Cognito post confirmation lambda
+
+#### Edit backend/db/schema.sql
+
+In the `schema.sql` file, add the email parameter to the users table.
+
+```sql
+CREATE TABLE public.users (
+  uuid UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  display_name text,
+  handle text,
+  email text, -- insert this line
+  cognito_user_id text,
+  created_at TIMESTAMP default current_timestamp NOT NULL
+);
+```
+
+#### Create the handler function
+
+- Create a lambda function in the same vpc as the rds instance Python 3.8
+- Add a layer for `psycopg2` with one of the below methods for development or production
+
+ENV variables needed for the lambda environment
+
+```bash
+PG_HOSTNAME='cruddur-db-instance.xxxxxxx.<aws-region>.rds.amazonaws.com'
+PG_DATABASE=''
+PG_USERNAME=''
+PG_PASSWORD=''
+```
+
+The function
+
+```python
+import json, os
+import psycopg2
+
+def lambda_handler(event, context):
+    user = event['request']['userAttributes']
+    print('userAttributes')
+    print(user)
+
+    user_display_name     = user['name']
+    user_email            = user['email']
+    user_handle           = user['preferred_username']
+    user_cognito_id       = user['sub']
+    try:
+        conn = psycopg2.connect(os.getenv('CONNECTION_URL'))
+        cur = conn.cursor()
+
+        sql = f"""
+          "INSERT INTO users (
+          display_name,
+          email,
+          handle, 
+          cognito_user_id
+          )
+          VALUES(
+            {user_display_name}, 
+            {user_email},
+            {user_handle},
+            {user_cognito_id}
+          )"
+        """
+        cur.execute(sql)
+        conn.commit() 
+
+    except (Exception, psycopg2.DatabaseError) as error:
+      print(error)
+    finally:
+      if conn is not None:
+        cur.close()
+        conn.close()
+        print('Database connection closed.')
+
+    return event
+```
+
+Then do the following 👇🏾
+
+- Copy the lamdba code in `aws/lambdas/cruddur-post-confirmation.py` to the lambda code source in aws and click on `deploy`
+- Click on the `configurations` tab to add an environment variable for the `CONNECTION_URL` then save
+
+### Development
+
+[aws-psycopg2](https://github.com/AbhimanyuHK/aws-psycopg2)
+
+This is a custom compiled psycopg2 C library for Python. Due to AWS Lambda missing the required PostgreSQL libraries in the AMI image, we needed to compile psycopg2 with the PostgreSQL libpq.so library statically linked libpq library instead of the default dynamic link.
+
+`Easiest Method`
+
+Some precompiled versions of this layer are available publicly on AWS freely to add to your function by ARN reference.
+
+[psycopg2-lambda-layer](https://github.com/jetbridge/psycopg2-lambda-layer)
+
+- Just go to the Layers + in the lambda function console and add a reference for your region
+
+`arn:aws:lambda:ca-central-1:898466741470:layer:psycopg2-py38:1`
+
+Alternatively you can create your own development layer by downloading the psycopg2-binary source files from `https://pypi.org/project/psycopg2-binary/#files`
+
+- Download the package for the lambda runtime environment: [psycopg2_binary-2.9.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl](https://files.pythonhosted.org/packages/36/af/a9f06e2469e943364b2383b45b3209b40350c105281948df62153394b4a9/psycopg2_binary-2.9.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl)
+
+- Extract to a folder, then zip up that folder and upload as a new lambda layer to your AWS account
+
+### Production
+
+Follow the instructions on `https://github.com/AbhimanyuHK/aws-psycopg2` to compile your own layer from postgres source libraries for the desired version.
+
+
+### Add the function to Cognito 
+
+Under the user pool properties add the function as a `Post Confirmation` lambda trigger
