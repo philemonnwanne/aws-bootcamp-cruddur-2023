@@ -19,10 +19,10 @@ def lambda_handler(event, context):
             cognito_user_id
             )
             VALUES (
-                {user_display_name}, 
-                {user_email},
-                {user_handle},
-                {user_cognito_id}
+                '{user_display_name}', 
+                '{user_email}',
+                '{user_handle}',
+                '{user_cognito_id}'
             )
         """
         conn = psycopg2.connect(os.getenv('CONNECTION_URL'))

@@ -10,13 +10,13 @@ export OS1=$(lsb_release -is 2>/dev/null)
 export OS2=$(sw_vers --productName 2>/dev/null)
 
 if [ "$OS1" = "Ubuntu" ]; then
-  echo "This is a ${OS1} environment!!!"
   export GITPOD_IP=$(curl ifconfig.me)
   EXT_IP=$GITPOD_IP
+  echo "This is a ${OS1} environment!!!"
 else
-  echo "This is a ${OS2} environment!!!"
   export MACHINE_IP=$(curl -s http://ipecho.net/plain; echo)
   EXT_IP=$MACHINE_IP
+  echo "This is a ${OS2} environment!!!"
 fi
 
 aws ec2 modify-security-group-rules \

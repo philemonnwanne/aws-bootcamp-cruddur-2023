@@ -11,11 +11,11 @@ printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 seed_path="$(realpath .)/db/seed.sql"
 
 if [ "$1" = "prod" ]; then
-  echo "Running in production!!! mode"
   URL=$PROD_CONNECTION_URL
+  echo "Running in production!!! mode"
 else
-  echo "Running in development!!! mode"
   URL=$DEV_CONNECTION_URL
+  echo "Running in development!!! mode"
 fi
 
 psql $URL cruddur < $seed_path && echo "Database seeded Successfully" 

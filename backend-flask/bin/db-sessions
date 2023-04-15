@@ -7,11 +7,11 @@ LABEL="db-session"
 printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 
 if [ "$1" = "prod" ]; then
-  echo "Running in production!!! mode"
   URL=$PROD_CONNECTION_URL
+  echo "Running in production!!! mode"
 else 
-  echo "Running in development!!! mode"
   URL=$DEV_CONNECTION_URL
+  echo "Running in development!!! mode"
 fi
 
 NO_DB_URL=$(sed 's/\/cruddur//g' <<< "$URL")

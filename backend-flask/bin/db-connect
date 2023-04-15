@@ -7,11 +7,11 @@ LABEL="db-connect"
 printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 
 if [ "$1" = "prod" ]; then
-  echo "Connected to the Production DATABASE!!!"
   URL=$PROD_CONNECTION_URL
+  echo "Connected to the Production DATABASE!!!"
 else
-  echo "Connected to the Development DATABASE!!!"
   URL=$DEV_CONNECTION_URL
+  echo "Connected to the Development DATABASE!!!"
 fi
 
 psql $URL

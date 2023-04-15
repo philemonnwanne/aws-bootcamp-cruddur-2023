@@ -283,12 +283,17 @@ We will create a new bash script `bin/db-connect` with the following content
 # Script compatible with both zsh and bash shells
 #!/usr/bin/env bash
 
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="db-connect"
+printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
+
 if [ "$1" = "prod" ]; then
-  echo "Connected to the Production DATABASE!!!"
   URL=$PROD_CONNECTION_URL
+  echo "Connected to the Production DATABASE!!!"
 else
-  echo "Connected to the Development DATABASE!!!"
   URL=$DEV_CONNECTION_URL
+  echo "Connected to the Development DATABASE!!!"
 fi
 
 psql $URL
@@ -344,11 +349,11 @@ printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 seed_path="$(realpath .)/db/seed.sql"
 
 if [ "$1" = "prod" ]; then
-  echo "Running in production!!! mode"
   URL=$PROD_CONNECTION_URL
+  echo "Running in production!!! mode"
 else
-  echo "Running in development!!! mode"
   URL=$DEV_CONNECTION_URL
+  echo "Running in development!!! mode"
 fi
 
 psql $URL cruddur < $seed_path && echo "Database seeded Successfully" 
@@ -381,11 +386,11 @@ LABEL="db-session"
 printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 
 if [ "$1" = "prod" ]; then
-  echo "Running in production!!! mode"
   URL=$PROD_CONNECTION_URL
+  echo "Running in production!!! mode"
 else 
-  echo "Running in development!!! mode"
   URL=$DEV_CONNECTION_URL
+  echo "Running in development!!! mode"
 fi
 
 NO_DB_URL=$(sed 's/\/cruddur//g' <<< "$URL")
@@ -610,13 +615,13 @@ export OS1=$(lsb_release -is 2>/dev/null)
 export OS2=$(sw_vers --productName 2>/dev/null)
 
 if [ "$OS1" = "Ubuntu" ]; then
-  echo "This is a ${OS1} environment!!!"
   export GITPOD_IP=$(curl ifconfig.me)
   EXT_IP=$GITPOD_IP
+  echo "This is a ${OS1} environment!!!"
 else
-  echo "This is a ${OS2} environment!!!"
   export MACHINE_IP=$(curl -s http://ipecho.net/plain; echo)
   EXT_IP=$MACHINE_IP
+  echo "This is a ${OS2} environment!!!"
 fi
 
 aws ec2 modify-security-group-rules \
@@ -709,10 +714,10 @@ def lambda_handler(event, context):
         cognito_user_id
         )
         VALUES (
-          {user_display_name}, 
-          {user_email},
-          {user_handle},
-          {user_cognito_id}
+          '{user_display_name}', 
+          '{user_email}',
+          '{user_handle}',
+          '{user_cognito_id}'
         )
       """
       conn = psycopg2.connect(os.getenv('CONNECTION_URL'))
