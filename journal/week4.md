@@ -797,7 +797,7 @@ DELETE FROM table_name WHERE condition; -- Delete data from a table
 ```
 
 
-### Extra Work
+## Extra Work
 
 Created a bash script which `auto detects` my work environment (gitpod or my local machine) and auto updates my `RDS instance` on aws.
 
