@@ -599,7 +599,7 @@ aws ec2 modify-security-group-rules \
 
 To automate the process above
 
-Then we will create a new script `bin/db-sg-rule-mod` with the following content
+Then we will create a new script `bin/mod-rds-sec-grp` with the following content
 
 ```bash
 # Script compatible with both zsh and bash shells
@@ -794,4 +794,39 @@ SELECT column1, column2, ... FROM table_name WHERE condition; -- Select data fro
 INSERT INTO table_name (column1, column2, ...) VALUES (value1, value2, ...); -- Insert data into a table
 UPDATE table_name SET column1 = value1, column2 = value2, ... WHERE condition; -- Update data in a table
 DELETE FROM table_name WHERE condition; -- Delete data from a table
+```
+
+
+### Extra Work
+
+Created a bash script which `auto detects` my work environment(gitpod or my local machine) and auto updates my `RDS instance` on aws.
+
+`Note:` The script is also compatible for both zsh and bash shells
+
+#### sample-script
+```bash
+# Script compatible with both zsh and bash shells
+#!/usr/bin/env bash
+
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="db-sg-rule-mod"
+printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
+
+export OS1=$(lsb_release -is 2>/dev/null)
+export OS2=$(sw_vers --productName 2>/dev/null)
+
+if [ "$OS1" = "Ubuntu" ]; then
+  export GITPOD_IP=$(curl ifconfig.me)
+  EXT_IP=$GITPOD_IP
+  echo "This is a ${OS1} environment!!!"
+else
+  export MACHINE_IP=$(curl -s http://ipecho.net/plain; echo)
+  EXT_IP=$MACHINE_IP
+  echo "This is a ${OS2} environment!!!"
+fi
+
+aws ec2 modify-security-group-rules \
+  --group-id $DB_SG_ID \
+  --security-group-rules "SecurityGroupRuleId=$DB_SG_RULE_ID,SecurityGroupRule={IpProtocol=tcp,FromPort=5432,ToPort=5432CidrIpv4=$EXT_IP/32,Description=RDS_Access_Phil}"
 ```
