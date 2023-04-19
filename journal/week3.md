@@ -1,10 +1,22 @@
+<p align=right> 
+<a href="https://gitpod.io/#https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023">
+  <img
+    src="https://img.shields.io/badge/Contribute%20with-Gitpod-908a85?logo=gitpod"
+    alt="Contribute with Gitpod"
+    style="text-align: right"
+  />
+</a>
+</p>
+
 # Week 3 — Decentralized Authentication
 
-## Setup Cognito
+## Required Homework/Tasks
+
+### Setup Cognito
 
 Go to the AWS console and setup an AWS Cognito userpool
 
-## Install Amplify
+### Install Amplify
 
 While in the frontend directory, run the the following commands
 
@@ -14,7 +26,7 @@ npm install aws-amplify --save
 
 This will add the `aws-amplify` package as a dependency in the `package.json` file
 
-## Configure Amplify
+### Configure Amplify
 
 Move into the frontend `src` directory
 
@@ -41,7 +53,7 @@ Amplify.configure({
 });
 ```
 
-## Conditionally show components based on logged in or logged out
+### Conditionally show components based on logged in or logged out
 
 Add the following to`HomeFeedPage.js` file
 
@@ -184,7 +196,7 @@ const resend_code = async (event) => {
   }
   ```
 
-## Recovery Page
+### Recovery Page
 
   ```js
 import { Auth } from 'aws-amplify';
@@ -212,7 +224,7 @@ const onsubmit_send_code = async (event) => {
   }
   ```
 
-## Authenticating Server Side
+### Authenticating Server Side
 
 Add in the `HomeFeedPage.js` a header to pass along the access token
 
@@ -234,7 +246,7 @@ cors = CORS(
 )
 ```
 
-## Setup up Cognito Authentication
+### Setup up Cognito Authentication
 
 Add to the `requirements.txt`
 
@@ -421,4 +433,37 @@ def data_home():
     app.logger.debug("unauthenicated")
     data = HomeActivities.run()
   return data, 200
+```
+
+## Homework Challenges
+
+### Implementing MFA to send SMS
+
+![cruddur_sns_iam_role](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week3/cruddur_sns_iam_role.png)
+cruddur_sns_iam_role
+
+![cruddur_sns_policy](https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023/blob/main/journal/images/week3/cruddur_sns_policy.png)
+cruddur_sns_policy
+
+#### Trust Relationships
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "cognito-idp.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole",
+            "Condition": {
+                "StringEquals": {
+                    "sts:ExternalId": "ba68e244-86ac-4361-a4d4-2d812bef1d91"
+                }
+            }
+        }
+    ]
+}
 ```
