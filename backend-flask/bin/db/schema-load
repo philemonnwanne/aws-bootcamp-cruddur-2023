@@ -1,24 +1,21 @@
 # Script compatible with both zsh and bash shells
 #!/usr/bin/env bash
 
+# schema_path="db/schema.sql"
+
 CYAN='\033[1;36m'
 NO_COLOR='\033[0m'
-LABEL="db-session"
+LABEL="schema-load"
 printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
+
+schema_path="$(realpath ..)/db/schema.sql"
 
 if [ "$1" = "prod" ]; then
   URL=$PROD_CONNECTION_URL
   echo "Running in production!!! mode"
-else 
+else
   URL=$DEV_CONNECTION_URL
   echo "Running in development!!! mode"
 fi
 
-NO_DB_URL=$(sed 's/\/cruddur//g' <<< "$URL")
-psql $NO_DB_URL -c "select pid as process_id, \
-       usename as user,  \
-       datname as db, \
-       client_addr, \
-       application_name as app,\
-       state \
-from pg_stat_activity;"
+psql $URL cruddur < $schema_path && echo "Database Schema Loaded Successfully" 

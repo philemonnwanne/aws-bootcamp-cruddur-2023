@@ -3,7 +3,7 @@
 
 CYAN='\033[1;36m'
 NO_COLOR='\033[0m'
-LABEL="db-sg-rule-mod"
+LABEL="mod-sec-grp"
 printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 
 export OS1=$(lsb_release -is 2>/dev/null)

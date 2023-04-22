@@ -209,12 +209,12 @@ gp env PROD_CONNECTION_URL="postgresql://cruddurroot:[password]@[aws-db-endpoint
 
 While in the backend directory create the folder `bin` this will hold all the shell scripts for working on our database
 
-create three new files in the `bin` directory
+create three new files in the `bin/db` directory
 
 ```bash
-touch /bin/db-create \
-      /bin/db-drop \
-      /bin/db-schema-load
+touch /bin/db/create \
+      /bin/db/drop \
+      /bin/db/schema-load
 ```
 
 Make the files executable
@@ -242,7 +242,7 @@ We can make prints for our shell scripts coloured so we can see what we're doing
 ```ruby
 CYAN='\033[1;36m'
 NO_COLOR='\033[0m'
-LABEL="db-schema-load"
+LABEL="schema-load"
 printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 ```
 
@@ -277,7 +277,7 @@ CREATE TABLE public.activities (
 
 ### Connect to the Database
 
-We will create a new bash script `bin/db-connect` with the following content
+We will create a new bash script `bin/db/connect` with the following content
 
 ```bash
 # Script compatible with both zsh and bash shells
@@ -285,7 +285,7 @@ We will create a new bash script `bin/db-connect` with the following content
 
 CYAN='\033[1;36m'
 NO_COLOR='\033[0m'
-LABEL="db-connect"
+LABEL="connect"
 printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 
 if [ "$1" = "prod" ]; then
@@ -302,13 +302,13 @@ fi
 We will make it executable:
 
 ```bash
-chmod 744 bin/db-connect
+chmod 744 bin/db/connect
 ```
 
 To execute the script:
 
 ```bash
-./bin/db-connect
+./bin/db/connect
 ```
 
 ### Add sample data to our Database
@@ -333,20 +333,20 @@ VALUES
 
 ### Seed the Database
 
-We will create a new script `bin/db-seed` with the following content
+We will create a new script `bin/db/seed` with the following content
 
 ```bash
 # Script compatible with both zsh and bash shells
 #!/usr/bin/env bash
 
-# seed_path="db/seed.sql"
+# seed_path="../db/seed.sql"
 
 CYAN='\033[1;36m'
 NO_COLOR='\033[0m'
-LABEL="db-seed"
+LABEL="db/seed"
 printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 
-seed_path="$(realpath .)/db/seed.sql"
+seed_path="$(realpath ..)/db/seed.sql"
 
 if [ "$1" = "prod" ]; then
   URL=$PROD_CONNECTION_URL
@@ -362,19 +362,19 @@ psql $URL cruddur < $seed_path && echo "Database seeded Successfully"
 We will make it executable:
 
 ```bash
-chmod 744 bin/db-seed
+chmod 744 bin/db/seed
 ```
 
 To execute the script:
 
 ```bash
-./bin/db-seed
+./bin/db/seed
 ```
 
 
 ### See what connections we are using
 
-We will create a new script `bin/db-sessions` with the following content
+We will create a new script `bin/db/sessions` with the following content
 
 ```bash
 # Script compatible with both zsh and bash shells
@@ -382,7 +382,7 @@ We will create a new script `bin/db-sessions` with the following content
 
 CYAN='\033[1;36m'
 NO_COLOR='\033[0m'
-LABEL="db-session"
+LABEL="db/session"
 printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 
 if [ "$1" = "prod" ]; then
@@ -406,18 +406,18 @@ from pg_stat_activity;"
 We will make it executable:
 
 ```bash
-chmod 744 bin/db-sessions
+chmod 744 bin/db/sessions
 ```
 
 To execute the script:
 
 ```bash
-./bin/db-sessions
+./bin/db/sessions
 ```
 
 ### Automate database setup (for local... dev mode only ⚠️❗️)
 
-We will create a new script `bin/db-setup` with the following content
+We will create a new script `bin/db/setup` with the following content
 
 ```bash
 # Script compatible with both zsh and bash shells
@@ -426,27 +426,27 @@ We will create a new script `bin/db-setup` with the following content
 
 CYAN='\033[1;36m'
 NO_COLOR='\033[0m'
-LABEL="db-setup"
+LABEL="setup"
 printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 
-bin_path="$(realpath .)/bin"
+bin_path="$(realpath ..)/bin"
 
-source "$bin_path/db-drop"
-source "$bin_path/db-create"
-source "$bin_path/db-schema-load"
-source "$bin_path/db-seed"
+source "$bin_path/db/drop"
+source "$bin_path/db/create"
+source "$bin_path/db/schema-load"
+source "$bin_path/db/seed"
 ```
 
 We will make it executable:
 
 ```bash
-chmod 744 bin/db-setup
+chmod 744 bin/db/setup
 ```
 
 To execute the script:
 
 ```bash
-./bin/db-setup
+./bin/db/setup
 ```
 
 ### Install Postgres Driver
@@ -599,7 +599,7 @@ aws ec2 modify-security-group-rules \
 
 To automate the process above
 
-Then we will create a new script `bin/mod-rds-sec-grp` with the following content
+Then we will create a new script `bin/rds/mod-sec-grp` with the following content
 
 ```bash
 # Script compatible with both zsh and bash shells
@@ -608,7 +608,7 @@ Then we will create a new script `bin/mod-rds-sec-grp` with the following conten
 
 CYAN='\033[1;36m'
 NO_COLOR='\033[0m'
-LABEL="db-sg-rule-mod"
+LABEL="mod-sec-grp"
 printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 
 export OS1=$(lsb_release -is 2>/dev/null)
@@ -639,13 +639,13 @@ DB_SG_RULE_ID
 We will make it executable:
 
 ```bash
-chmod 744 bin/db-sg-rule-mod
+chmod 744 bin/rds/mod-sec-grp
 ```
 
 To execute the script:
 
 ```bash
-./bin/db-sg-rule-mod
+./bin/rds/mod-sec-grp
 ```
 
 ### Update Gitpod IP on new env var
@@ -810,7 +810,7 @@ Created a bash script which `auto detects` my work environment (gitpod or my loc
 
 CYAN='\033[1;36m'
 NO_COLOR='\033[0m'
-LABEL="db-sg-rule-mod"
+LABEL="mod-sec-grp"
 printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 
 export OS1=$(lsb_release -is 2>/dev/null)
