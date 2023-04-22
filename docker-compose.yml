@@ -71,30 +71,34 @@ services:
   #     - ${APP_NAME}-network
       
   # Database Service[Postgres]
-  postgres-db:
-    image: postgres:13-alpine
-    restart: always
-    environment:
-      POSTGRES_USER: "${POSTGRES_USER}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-    container_name: postgres-db
-    ports:
-      - '5432:5432'
-    volumes:
-      - db:/var/lib/postgresql/data
-    networks:
-      - ${APP_NAME}-network
+  # postgres-db:
+  #   image: postgres:13-alpine
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: "${POSTGRES_USER}"
+  #     POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+  #   container_name: postgres-db
+  #   ports:
+  #     - '5432:5432'
+  #   volumes:
+  #     - db:/var/lib/postgresql/data
+  #   networks:
+  #     - ${APP_NAME}-network
 
   # Database Service[dynamodb_local]
-  # dynamodb-local:
-  #   command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
-  #   image: "amazon/dynamodb-local:latest"
-  #   container_name: dynamodb-local
-  #   ports:
-  #     - "8000:8000"
-  #   volumes:
-  #     - "./docker/dynamodb:/home/dynamodblocal/data"
-  #   working_dir: /home/dynamodblocal
+  dynamodb-local:
+    # we need to add root to get this working
+    user: root
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    image: "amazon/dynamodb-local:latest"
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./docker/dynamodb:/home/dynamodblocal/data"
+    working_dir: /home/dynamodblocal
+    networks:
+      - ${APP_NAME}-network
 
 # Docker Networks
 networks:
@@ -102,6 +106,6 @@ networks:
     driver: bridge
 
 # Docker Volumes
-volumes:
-  db:
-    driver: local
+# volumes:
+#   db:
+#     driver: local
