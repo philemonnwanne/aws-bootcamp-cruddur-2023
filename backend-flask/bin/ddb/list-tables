@@ -1,0 +1,14 @@
+# Script compatible with both zsh and bash shells
+#!/usr/bin/env bash
+
+if [ "$1" = "prod" ]; then
+  ENDPOINT_URL=""
+  echo "Running in production!!! mode"
+else
+  ENDPOINT_URL="--endpoint-url=http://localhost:8000"
+  echo "Running in development!!! mode"
+fi
+
+aws dynamodb list-tables $ENDPOINT_URL
+
+// psql $URL cruddur < $seed_path && echo "Database seeded Successfully"
