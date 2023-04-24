@@ -1,5 +1,6 @@
 # Script compatible with both zsh and bash shells
 #!/usr/bin/env bash
+set -e # stop if it fails at any point
 
 if [ "$1" = "prod" ]; then
   ENDPOINT_URL=""
@@ -9,6 +10,6 @@ else
   echo "Running in development!!! mode"
 fi
 
-aws dynamodb list-tables $ENDPOINT_URL
-
-// psql $URL cruddur < $seed_path && echo "Database seeded Successfully"
+aws dynamodb list-tables $ENDPOINT_URL \
+  --query TableNames \
+  --output table

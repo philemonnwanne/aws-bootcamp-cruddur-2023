@@ -12,7 +12,13 @@
 
 ## Required Homework/Tasks
 
-## Automate Database Workflow
+### Install the `boto3` library
+
+Move to the backend directory and run the command
+
+```bash
+ pip install -r requirements.txt
+ ```
 
 While in the backend directory create the folder `bin` create three new files in the `bin/ddb` directory
 
@@ -49,7 +55,7 @@ if len(sys.argv) == 2:
 
 dynamodb = boto3.client('dynamodb',**attrs)
 
-table_name = 'cruddur-message'
+table_name = 'cruddur-messages'
 
 response = dynamodb.create_table(
     TableName=table_name,
@@ -112,7 +118,9 @@ else
   echo "Running in development!!! mode"
 fi
 
-aws dynamodb list-tables $ENDPOINT_URL
+aws dynamodb list-tables $ENDPOINT_URL \
+ --query TableNames \
+ --output table
 ```
 
 We will make it executable:
