@@ -134,3 +134,19 @@ To execute the script:
 ```bash
 ./bin/ddb/list-tables
 ```
+
+### Seed Data
+
+We will create a new bash script `bin/ddb/seed`
+
+We will make it executable:
+
+```bash
+chmod 744 bin/ddb/seed
+```
+
+To execute the script:
+
+```bash
+./bin/ddb/seed
+```
