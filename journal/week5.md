@@ -35,7 +35,7 @@ Make the files executable
 chmod 744 bin/ddb/*
 ```
 
-### Load Database Schema
+### Load Database Schema (Create Database Table)
 
 We will create a new python script `bin/ddb/schema-load` with the following content
 
@@ -133,6 +133,14 @@ To execute the script:
 
 ```bash
 ./bin/ddb/list-tables
+```
+
+### Drop Table
+
+To delete a table in development mode, make sure to be in the `backend-flask` directory and run
+
+```bash
+./bin/ddb/drop ["table name here"]
 ```
 
 ### Seed Data

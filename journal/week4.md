@@ -97,7 +97,7 @@ If the above command is successful you will get a similar `json` ouput
 To connect to a local postgres db
 
 ```bash
-psql -U postgress --host localhost
+psql -U postgres --host localhost
 ```
 
 ### Create Database
@@ -114,7 +114,7 @@ createdb cruddur -h localhost -U postgres
 Accessing the postgres container and running an underlying SQL command
 
 ```bash
-psql -U postgress --host localhost
+psql -U postgres --host localhost
 ```
 
 ```sql

@@ -22,3 +22,5 @@ source venv/bin/activate
 ```
 pip install flask
 ```
+
+<!-- REMINDER TO ALWAYS SWITCH POSTGRES CONNECTION_URL IN DOCKER COMPOSE FILE -->
