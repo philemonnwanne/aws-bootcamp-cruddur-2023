@@ -8,6 +8,15 @@ NO_COLOR='\033[0m'
 LABEL="seed"
 printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 
+CONNECTION_URL="postgresql://postgres:postgres@127.0.0.1:5432/cruddur"
+
+if [ DEV_CONNECTION_URL = ${CONNECTION_URL} ]; then
+  echo "connection url is valid"
+else
+  DEV_CONNECTION_URL=$CONNECTION_URL
+  echo "Switched connection url for temp shell script access!"
+fi
+
 seed_path="$(realpath .)/db/seed.sql"
 
 if [ "$1" = "prod" ]; then

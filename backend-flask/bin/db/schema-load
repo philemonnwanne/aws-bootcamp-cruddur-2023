@@ -1,12 +1,19 @@
 # Script compatible with both zsh and bash shells
 #!/usr/bin/env bash
 
-# schema_path="db/schema.sql"
-
 CYAN='\033[1;36m'
 NO_COLOR='\033[0m'
 LABEL="schema-load"
 printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
+
+CONNECTION_URL="postgresql://postgres:postgres@127.0.0.1:5432/cruddur"
+
+if [ DEV_CONNECTION_URL = ${CONNECTION_URL} ]; then
+  echo "connection url is valid"
+else
+  DEV_CONNECTION_URL=$CONNECTION_URL
+  echo "Switched connection url for temp shell script access!"
+fi
 
 schema_path="$(realpath .)/db/schema.sql"
 
