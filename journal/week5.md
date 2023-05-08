@@ -158,3 +158,20 @@ To execute the script:
 ```bash
 ./bin/ddb/seed
 ```
+
+
+
+### EXTRAS
+
+Modify scripts to run without having to manually export env values based on os host. This solves the issue of having to set different env values when trying to connect to the db manually. Therefore the same connection url parameter can be use to supply arguments from the env vars or conditionally via the scripts.
+
+```bash
+CONNECTION_URL="postgresql://postgres:postgres@127.0.0.1:5432/cruddur"
+
+if [ DEV_CONNECTION_URL = ${CONNECTION_URL} ]; then
+  echo "connection url is valid"
+else
+  DEV_CONNECTION_URL=$CONNECTION_URL
+  echo "Switched connection url for temp shell script access!"
+fi
+```
