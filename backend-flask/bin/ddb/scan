@@ -12,10 +12,10 @@ dynamodb = boto3.resource('dynamodb',**attrs)
 
 table = dynamodb.Table(table_name)
 response = table.scan()
- 
-print('=======')
-print(response)
 
 items = response['Items']
 for item in items:
+   print("")
+   print("=================================================================")
+   print("")
    print(item)
