@@ -145,9 +145,7 @@ To delete a table in development mode, make sure to be in the `backend-flask` di
 
 ### Seed Data
 
-We will create a new bash script `bin/ddb/seed`
-
-We will make it executable:
+We will create a new python script `bin/ddb/seed` and make it executable:
 
 ```bash
 chmod 744 bin/ddb/seed
@@ -159,7 +157,43 @@ To execute the script:
 ./bin/ddb/seed
 ```
 
+### Scan Database
 
+We will create a new python script `bin/ddb/scan` with the following content
+
+```bash
+#!/usr/bin/env python3
+
+import boto3
+
+table_name = 'cruddur-messages'
+
+attrs = {
+  'endpoint_url': 'http://localhost:8000'
+}
+
+dynamodb = boto3.resource('dynamodb',**attrs)
+
+table = dynamodb.Table(table_name)
+response = table.scan()
+
+items = response['Items']
+for item in items:
+   print("")
+   print("=================================================================")
+   print("")
+   print(item)
+```
+
+```bash
+chmod 744 bin/ddb/scan
+```
+
+To execute the script:
+
+```bash
+./bin/ddb/scan
+```
 
 ### EXTRAS
 
