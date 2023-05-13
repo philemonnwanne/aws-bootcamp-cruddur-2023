@@ -7,8 +7,8 @@ import MessageGroupFeed from '../components/MessageGroupFeed';
 import MessagesFeed from '../components/MessageFeed';
 import MessagesForm from '../components/MessageForm';
 
-// AWS AMplify
-import { Auth } from 'aws-amplify';
+// Enable Authentication
+import checkAuth from '../lib/checkAuth';
 
 export default function MessageGroupPage() {
   const [messageGroups, setMessageGroups] = React.useState([]);
@@ -59,26 +59,6 @@ export default function MessageGroupPage() {
     }
   };  
 
-  // check if we are authenicated
-  const checkAuth = async () => {
-    Auth.currentAuthenticatedUser({
-      // Optional, By default is false. 
-      // If set to true, this call will send a 
-      // request to Cognito to get the latest user data
-      bypassCache: false 
-    })
-    .then((user) => {
-      console.log('user',user);
-      return Auth.currentAuthenticatedUser()
-    }).then((cognito_user) => {
-        setUser({
-          display_name: cognito_user.attributes.name,
-          handle: cognito_user.attributes.preferred_username
-        })
-    })
-    .catch((err) => console.log(err));
-  };
-
   // check when the page loads if we are authenicated
   React.useEffect(()=>{
     //prevents double call
@@ -87,7 +67,7 @@ export default function MessageGroupPage() {
 
     loadMessageGroupsData();
     loadMessageGroupData();
-    checkAuth();
+    checkAuth(setUser);
   }, [])
   
   return (
