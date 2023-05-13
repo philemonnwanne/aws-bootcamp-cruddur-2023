@@ -13,3 +13,7 @@ source "$bin_path/db/drop"
 source "$bin_path/db/create"
 source "$bin_path/db/schema-load"
 source "$bin_path/db/seed"
+# Change to the directory containing the Python script
+cd $bin_path/db
+# Run the Python script
+python3 update-cognito-user-ids
