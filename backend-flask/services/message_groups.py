@@ -15,7 +15,7 @@ class MessageGroups:
       'cognito_user_id': cognito_user_id
     })
 
-    print("UUID",my_user_uuid)
+    print(f"UUID",my_user_uuid)
 
     ddb = Ddb.client()
     data = Ddb.list_message_groups(ddb, my_user_uuid)
