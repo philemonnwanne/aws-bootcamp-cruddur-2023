@@ -1,16 +1,16 @@
 [
-    {
-        "Notification": {
-            "ComparisonOperator": "GREATER_THAN",
-            "NotificationType": "ACTUAL",
-            "Threshold": 25,
-            "ThresholdType": "PERCENTAGE"
-        },
-        "Subscribers": [
-            {
-                "Address": "your email goes here",
-                "SubscriptionType": "EMAIL"
-            }
-        ]
-    }
+  {
+    "Notification": {
+      "ComparisonOperator": "GREATER_THAN",
+      "NotificationType": "ACTUAL",
+      "Threshold": 25,
+      "ThresholdType": "PERCENTAGE"
+    },
+    "Subscribers": [
+      {
+        "Address": "your email goes here",
+        "SubscriptionType": "EMAIL"
+      }
+    ]
+  }
 ]
