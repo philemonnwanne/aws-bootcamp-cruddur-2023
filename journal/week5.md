@@ -342,13 +342,11 @@ python3 update-cognito-user-ids
 
 # Week 5 — DynamoDB and Serverless Caching
 
-
 ## DynamoDB Bash Scripts
 
 ```sh
 ./bin/ddb/schem-load
 ```
-
 
 ## The Boundaries of DynamoDB
 
@@ -358,7 +356,6 @@ python3 update-cognito-user-ids
     - you have to delete the old one
 - Key condition expressions for query only for RANGE, HASH is only equality 
 - Don't create UUID for entity if you don't have an access pattern for it
-
 
 3 Access Patterns
 
@@ -440,8 +437,7 @@ WHERE
   AND message_groups.user_uuid = {{user_uuid}}
 ```
 
-
-## Serverless Caching
+## Serverless Caching (Skip)
 
 ### Install Momento CLI tool
 
@@ -487,7 +483,6 @@ Create the cache:
 momento cache create --name cruddur
 ```
 
-
 ### DynamoDB Stream trigger to update message groups
 
 - create a VPC endpoint for dynamoDB service on your VPC
@@ -500,7 +495,6 @@ momento cache create --name cruddur
 
 - grant the lambda IAM role permission to update table items
 
-
 **The Function**
 
 ```.py
@@ -510,11 +504,17 @@ from boto3.dynamodb.conditions import Key, Attr
 
 dynamodb = boto3.resource(
  'dynamodb',
- region_name='ca-central-1',
- endpoint_url="http://dynamodb.ca-central-1.amazonaws.com"
+ region_name='us-east-1',
+ endpoint_url="http://dynamodb.us-east-1.amazonaws.com"
 )
 
 def lambda_handler(event, context):
+  print('event-data',event)
+
+  eventName = event['Records'][0]['eventName']
+  if (eventName == 'REMOVE'):
+    print("skip REMOVE event")
+    return
   pk = event['Records'][0]['dynamodb']['Keys']['pk']['S']
   sk = event['Records'][0]['dynamodb']['Keys']['sk']['S']
   if pk.startswith('MSG#'):
