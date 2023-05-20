@@ -9,9 +9,9 @@ tasks:
       sudo ./aws/install
       cd $THEIA_WORKSPACE_ROOT
       rm -rf ../interim
-    # command: |
-    #   export GITPOD_IP=$(curl ifconfig.me)
-    #   source "$THEIA_WORKSPACE_ROOT/backend-flask/bin/rds/mod-sec-grp"
+    command: |
+      export GITPOD_IP=$(curl ifconfig.me)
+      source "$THEIA_WORKSPACE_ROOT/backend-flask/bin/rds/mod-sec-grp"
 
   - name: postgres
     init: |
