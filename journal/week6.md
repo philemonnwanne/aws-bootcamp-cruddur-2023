@@ -92,11 +92,11 @@ except Exception as e:
 We will make it executable:
 
 ```bash
-chmod 744 bin/db/test
+chmod 744 bin/flask/health-check
 ```
 
 To execute the script:
 
 ```bash
-./bin/db/test
+./bin/flask/health-check
 ```
