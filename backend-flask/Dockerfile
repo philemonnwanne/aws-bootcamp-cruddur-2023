@@ -1,4 +1,4 @@
-FROM python:alpine3.16
+FROM 183066416469.dkr.ecr.us-east-1.amazonaws.com/cruddur-python:3.11.3-alpine
 
 WORKDIR /backend-flask
 
