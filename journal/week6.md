@@ -100,3 +100,282 @@ To execute the script:
 ```bash
 ./bin/flask/health-check
 ```
+
+### Create Cloudwatch Logs
+
+We would want to have a general log for our cluster, and also set the retention period to 1 day
+
+```bash
+aws logs create-log-group --log-group-name "cruddur-fargate-cluster" \
+aws logs put-retention-policy --log-group-name "cruddur-fargate-cluster" --retention-in-days 1
+```
+
+### Create CloudWatch Log Group
+
+```bash
+aws ecs create-cluster \
+--cluster-name cruddur \
+--service-connect-defaults namespace=cruddur
+```
+
+### Gaining Access to ECS Fargate Container
+
+Create ECR repo and push image
+
+```sh
+aws ecr create-repository \
+  --repository-name cruddur-python \
+  --image-tag-mutability MUTABLE
+```
+
+### Login to ECR
+
+> Always do this before pushing to ECR
+
+```bash
+aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
+```
+
+#### Set URL
+
+```sh
+export ECR_PYTHON_URL="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/cruddur-python"
+
+echo $ECR_PYTHON_URL
+```
+
+### For Base-image python
+
+#### Pull Image
+
+```sh
+docker pull python:3.11.3-alpine
+```
+
+#### Tag Image
+
+```sh
+docker tag python:3.11.3-alpine $ECR_PYTHON_URL:3.11.3-alpine
+```
+
+#### Push Image
+
+```sh
+docker push $ECR_PYTHON_URL:3.11.3-alpine
+```
+
+### For Flask
+
+In your flask dockerfile update the from to instead of using DockerHub's python image
+you use your own eg.
+
+> remember to put the :latest tag on the end
+
+Create Repo
+
+```sh
+aws ecr create-repository \
+  --repository-name backend-flask \
+  --image-tag-mutability MUTABLE
+```
+
+Set URL
+
+```sh
+export ECR_BACKEND_FLASK_URL="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/backend-flask"
+echo $ECR_BACKEND_FLASK_URL
+```
+
+Build Image
+
+```sh
+docker build -t backend-flask .
+```
+
+Tag Image
+
+```sh
+docker tag backend-flask:latest $ECR_BACKEND_FLASK_URL
+```
+
+Push Image
+
+```sh
+docker push $ECR_BACKEND_FLASK_URL
+```
+
+### For Frontend React
+
+Create Repo
+
+```sh
+aws ecr create-repository \
+  --repository-name frontend-react-js \
+  --image-tag-mutability MUTABLE
+```
+
+Set URL
+
+```sh
+export ECR_FRONTEND_REACT_URL="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/frontend-react-js"
+echo $ECR_FRONTEND_REACT_URL
+```
+
+Build Image
+
+```sh
+docker build \
+--build-arg REACT_APP_BACKEND_URL="https://4567-$GITPOD_WORKSPACE_ID.$GITPOD_WORKSPACE_CLUSTER_HOST" \
+--build-arg REACT_APP_AWS_PROJECT_REGION="$AWS_DEFAULT_REGION" \
+--build-arg REACT_APP_AWS_COGNITO_REGION="$AWS_DEFAULT_REGION" \
+--build-arg REACT_APP_AWS_USER_POOLS_ID="ca-central-1_CQ4wDfnwc" \
+--build-arg REACT_APP_CLIENT_ID="5b6ro31g97urk767adrbrdj1g5" \
+-t frontend-react-js \
+-f Dockerfile.prod \
+.
+```
+
+Tag Image
+
+```sh
+docker tag frontend-react-js:latest $ECR_FRONTEND_REACT_URL:latest
+```
+
+Push Image
+
+```sh
+docker push $ECR_FRONTEND_REACT_URL:latest
+```
+
+If you want to run and test it
+
+```sh
+docker run --rm -p 3000:3000 -it frontend-react-js 
+```
+
+## Register Task Defintions
+
+### Passing Senstive Data to Task Defintion
+
+Make sure the following are set as environment variables before running the following commands
+
+- AWS_ACCESS_KEY_ID
+- AWS_SECRET_ACCESS_KEY
+- PROD_CONNECTION_URL
+- ROLLBAR_ACCESS_TOKEN
+- OTEL_EXPORTER_OTLP_HEADERS
+
+[specifying-sensitive-data](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data.html)
+
+[secrets-envvar-ssm-paramstore](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/secrets-envvar-ssm-paramstore.html)
+
+```sh
+aws ssm put-parameter --type "SecureString" --name "/cruddur/backend-flask/AWS_ACCESS_KEY_ID" --value $AWS_ACCESS_KEY_ID
+aws ssm put-parameter --type "SecureString" --name "/cruddur/backend-flask/AWS_SECRET_ACCESS_KEY" --value $AWS_SECRET_ACCESS_KEY
+aws ssm put-parameter --type "SecureString" --name "/cruddur/backend-flask/CONNECTION_URL" --value $PROD_CONNECTION_URL
+aws ssm put-parameter --type "SecureString" --name "/cruddur/backend-flask/ROLLBAR_ACCESS_TOKEN" --value $ROLLBAR_ACCESS_TOKEN
+aws ssm put-parameter --type "SecureString" --name "/cruddur/backend-flask/OTEL_EXPORTER_OTLP_HEADERS" --value $OTEL_EXPORTER_OTLP_HEADERS
+```
+
+### Create Task and Exection Roles for Task Defintion
+
+#### Create ExecutionRole
+
+In the aws directory create a json file `/policies/service-execution-role.json` and add the following content
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": ["sts:AssumeRole"],
+      "Effect": "Allow",
+      "Principal": {
+        "Service": ["ecs-tasks.amazonaws.com"]
+      }
+    }
+  ]
+}
+```
+
+> Create the role
+
+```sh
+aws iam create-role --role-name CruddurServiceExecutionRole --assume-role-policy-document file://aws/policies/service-execution-role.json
+```
+
+Now create another json file `/policies/service-execution-policy.json` and add the following content
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameter", 
+        "ssm:GetParameters"
+    ],
+      "Resource": "arn:aws:ssm:us-east-1:183066416469:parameter/cruddur/backend-flask/*"
+    }
+  ]
+}
+```
+
+> Attach the roles policy
+
+```sh
+aws iam put-role-policy --policy-name CruddurServiceExecutionPolicy --role-name CruddurServiceExecutionRole --policy-document file://aws/policies/service-execution-policy.json
+```
+
+#### Create TaskRole
+
+> Create the role
+
+```sh
+aws iam create-role \
+    --role-name CruddurTaskRole \
+    --assume-role-policy-document "{
+  \"Version\":\"2012-10-17\",
+  \"Statement\":[{
+    \"Action\":[\"sts:AssumeRole\"],
+    \"Effect\":\"Allow\",
+    \"Principal\":{
+      \"Service\":[\"ecs-tasks.amazonaws.com\"]
+    }
+  }]
+}"
+```
+
+> Attach the roles policy
+
+```sh
+aws iam put-role-policy \
+  --policy-name SSMAccessPolicy \
+  --role-name CruddurTaskRole \
+  --policy-document "{
+  \"Version\":\"2012-10-17\",
+  \"Statement\":[{
+    \"Action\":[
+      \"ssmmessages:CreateControlChannel\",
+      \"ssmmessages:CreateDataChannel\",
+      \"ssmmessages:OpenControlChannel\",
+      \"ssmmessages:OpenDataChannel\"
+    ],
+    \"Effect\":\"Allow\",
+    \"Resource\":\"*\"
+  }]
+}
+"
+```
+
+Attach the following policies for access to `CloudWatch` and` X-Ray`
+
+```sh
+aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/CloudWatchFullAccess --role-name CruddurTaskRole
+```
+
+```sh
+aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess --role-name CruddurTaskRole
+```
+
