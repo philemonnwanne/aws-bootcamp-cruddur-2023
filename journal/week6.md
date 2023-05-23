@@ -443,3 +443,47 @@ Create task definition for the backend
 ```sh
 aws ecs register-task-definition --cli-input-json file://aws/task-definitions/backend-flask.json
 ```
+
+### Create Security Group
+
+Export `VPC` id for the `VPC` name tag `cruddur-vpc`
+
+```sh
+export CRUDDUR_VPC_ID=$(aws ec2 describe-vpcs \
+--filters "Name=tag:Name, Values=cruddur-vpc" \
+--query "Vpcs[].VpcId" \
+--output text)
+echo $CRUDDUR_VPC_ID
+```
+
+<!-- Export `Subnet` id
+
+```sh
+export CRUDDUR_SUBNET_ID=$(aws ec2 describe-subnets  \
+--filters "Name=vpc-id, Values=$CRUDDUR_VPC_ID" \
+--query 'Subnets[*].SubnetId' \
+--output json | jq -r 'join(",")')
+echo $CRUDDUR_SUBNET_ID
+``` -->
+
+Create security group
+
+```sh
+export CRUD_SERVICE_SG=$(aws ec2 create-security-group \
+  --group-name "crud-srv-sg" \
+  --description "Security group for Cruddur services on ECS" \
+  --vpc-id $CRUDDUR_VPC_ID \
+  --query "GroupId" --output text)
+echo $CRUD_SERVICE_SG
+```
+
+<!-- Add ingress rule
+
+```sh
+aws ec2 authorize-security-group-ingress \
+  --group-id $CRUD_SERVICE_SG \
+  --protocol tcp \
+  --port 80 \
+  --cidr 0.0.0.0/0
+``` -->
+
