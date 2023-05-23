@@ -369,7 +369,7 @@ aws iam put-role-policy \
 "
 ```
 
-Attach the following policies for access to `CloudWatch` and` X-Ray`
+Attach the following policies for access to `CloudWatch` and `X-Ray`
 
 ```sh
 aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/CloudWatchFullAccess --role-name CruddurTaskRole
@@ -379,3 +379,65 @@ aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/CloudWatchFullAc
 aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess --role-name CruddurTaskRole
 ```
 
+### Create Json file
+
+Create a new folder called `aws/task-defintions` and place the following files in there:
+
+`backend-flask.json`
+
+```json
+{
+  "family": "backend-flask",
+  "executionRoleArn": "arn:aws:iam::AWS_ACCOUNT_ID:role/CruddurServiceExecutionRole",
+  "taskRoleArn": "arn:aws:iam::AWS_ACCOUNT_ID:role/CruddurTaskRole",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "backend-flask",
+      "image": "BACKEND_FLASK_IMAGE_URL",
+      "cpu": 256,
+      "memory": 512,
+      "essential": true,
+      "portMappings": [
+        {
+          "name": "backend-flask",
+          "containerPort": 4567,
+          "protocol": "tcp", 
+          "appProtocol": "http"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+            "awslogs-group": "cruddur",
+            "awslogs-region": "ca-central-1",
+            "awslogs-stream-prefix": "backend-flask"
+        }
+      },
+      "environment": [
+        {"name": "OTEL_SERVICE_NAME", "value": "backend-flask"},
+        {"name": "OTEL_EXPORTER_OTLP_ENDPOINT", "value": "https://api.honeycomb.io"},
+        {"name": "AWS_COGNITO_USER_POOL_ID", "value": ""},
+        {"name": "AWS_COGNITO_USER_POOL_CLIENT_ID", "value": ""},
+        {"name": "FRONTEND_URL", "value": ""},
+        {"name": "BACKEND_URL", "value": ""},
+        {"name": "AWS_DEFAULT_REGION", "value": ""}
+      ],
+      "secrets": [
+        {"name": "AWS_ACCESS_KEY_ID"    , "valueFrom": "arn:aws:ssm:AWS_REGION:AWS_ACCOUNT_ID:parameter/cruddur/backend-flask/AWS_ACCESS_KEY_ID"},
+        {"name": "AWS_SECRET_ACCESS_KEY", "valueFrom": "arn:aws:ssm:AWS_REGION:AWS_ACCOUNT_ID:parameter/cruddur/backend-flask/AWS_SECRET_ACCESS_KEY"},
+        {"name": "CONNECTION_URL"       , "valueFrom": "arn:aws:ssm:AWS_REGION:AWS_ACCOUNT_ID:parameter/cruddur/backend-flask/CONNECTION_URL" },
+        {"name": "ROLLBAR_ACCESS_TOKEN" , "valueFrom": "arn:aws:ssm:AWS_REGION:AWS_ACCOUNT_ID:parameter/cruddur/backend-flask/ROLLBAR_ACCESS_TOKEN" },
+        {"name": "OTEL_EXPORTER_OTLP_HEADERS" , "valueFrom": "arn:aws:ssm:AWS_REGION:AWS_ACCOUNT_ID:parameter/cruddur/backend-flask/OTEL_EXPORTER_OTLP_HEADERS" }
+        
+      ]
+    }
+  ]
+}
+```
+
+### Register Task Defintion
+
+```sh
+aws ecs register-task-definition --cli-input-json file://aws/task-definitions/backend-flask.json
+```
