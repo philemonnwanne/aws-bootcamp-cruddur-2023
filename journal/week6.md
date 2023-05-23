@@ -438,6 +438,8 @@ Create a new folder called `aws/task-defintions` and place the following files i
 
 ### Register Task Defintion
 
+Create task definition for the backend
+
 ```sh
 aws ecs register-task-definition --cli-input-json file://aws/task-definitions/backend-flask.json
 ```
