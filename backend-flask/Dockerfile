@@ -15,4 +15,5 @@ ENV FLASK_ENV=development \
 
 EXPOSE ${PORT}
 
-CMD [ "./init.sh"]
+# CMD [ "./init.sh"]
+CMD [ "python3", "-m", "flask", "run", "--host=0.0.0.0", "--port=4567" ]

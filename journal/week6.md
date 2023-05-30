@@ -110,7 +110,7 @@ aws logs create-log-group --log-group-name "cruddur-fargate-cluster" \
 aws logs put-retention-policy --log-group-name "cruddur-fargate-cluster" --retention-in-days 1
 ```
 
-### Create CloudWatch Log Group
+### Create Fargate Cluster
 
 ```bash
 aws ecs create-cluster \
@@ -298,7 +298,7 @@ In the aws directory create a json file `/policies/service-execution-role.json` 
 }
 ```
 
-> Create the role
+Create the role
 
 ```sh
 aws iam create-role --role-name CruddurServiceExecutionRole --assume-role-policy-document file://aws/policies/service-execution-role.json
@@ -313,6 +313,18 @@ Now create another json file `/policies/service-execution-policy.json` and add t
     {
       "Effect": "Allow",
       "Action": [
+        "ecr:GetAuthorizationToken",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:BatchGetImage",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
         "ssm:GetParameter", 
         "ssm:GetParameters"
     ],
@@ -322,15 +334,19 @@ Now create another json file `/policies/service-execution-policy.json` and add t
 }
 ```
 
-> Attach the roles policy
+Attach the roles policy
 
 ```sh
 aws iam put-role-policy --policy-name CruddurServiceExecutionPolicy --role-name CruddurServiceExecutionRole --policy-document file://aws/policies/service-execution-policy.json
 ```
 
+```sh
+aws iam put-role-policy --policy-name CruddurCloudWatchFullAccess --role-name CruddurServiceExecutionRole --policy-document file://aws/policies/cloudwatch-full-access.json
+```
+
 #### Create TaskRole
 
-> Create the role
+Create the role
 
 ```sh
 aws iam create-role \
@@ -347,7 +363,7 @@ aws iam create-role \
 }"
 ```
 
-> Attach the roles policy
+Attach the roles policy
 
 ```sh
 aws iam put-role-policy \
@@ -477,7 +493,17 @@ export CRUD_SERVICE_SG=$(aws ec2 create-security-group \
 echo $CRUD_SERVICE_SG
 ```
 
-<!-- Add ingress rule
+Describe security group (if it already exists)
+
+```sh
+export CRUD_SERVICE_SG=$(aws ec2 describe-security-groups \
+  --filters "Name=vpc-id, Values=$CRUDDUR_VPC_ID" \
+  --query "SecurityGroups[*].{ID:GroupId}" \
+  --output text)
+echo $CRUD_SERVICE_SG
+```
+
+Add ingress rule
 
 ```sh
 aws ec2 authorize-security-group-ingress \
@@ -485,5 +511,18 @@ aws ec2 authorize-security-group-ingress \
   --protocol tcp \
   --port 80 \
   --cidr 0.0.0.0/0
-``` -->
+```
 
+
+
+### Extras
+
+Fix docker push error (denied: Your authorization token has expired. Reauthenticate and try again.)
+
+```sh
+aws ecr get-login-password \
+    --region <region> \
+| docker login \
+    --username AWS \
+    --password-stdin <aws_account_id>.dkr.ecr.<region>.amazonaws.com
+```
