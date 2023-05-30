@@ -513,8 +513,6 @@ aws ec2 authorize-security-group-ingress \
   --cidr 0.0.0.0/0
 ```
 
-
-
 ### Extras
 
 Fix docker push error (denied: Your authorization token has expired. Reauthenticate and try again.)
@@ -525,4 +523,74 @@ aws ecr get-login-password \
 | docker login \
     --username AWS \
     --password-stdin <aws_account_id>.dkr.ecr.<region>.amazonaws.com
+```
+
+## Not able to use Sessions Manager to get into cluster EC2 sintance
+
+The instance can hang up for various reasons.
+You need to reboot and it will force a restart after 5 minutes
+So you will have to wait 5 minutes or after a timeout.
+
+You have to use the AWS CLI. 
+You can't use the `AWS Console`. it will not work as expected.
+
+The console will only do a graceful shutdodwn
+The CLI will do a forceful shutdown after a period of time if graceful shutdown fails.
+
+```sh
+aws ec2 reboot-instances --instance-ids i-0d15aef0618733b6d
+```
+
+### Connection via Sessions Manaager (Fargate)
+
+[Install the Session Manager plugin on Debian](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html#install-plugin-debian)
+
+Install for Ubuntu
+
+```sh
+curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
+```
+
+Run the install command
+
+```sh
+sudo dpkg -i session-manager-plugin.deb
+```
+
+Verify that the installation was successful
+
+```sh
+session-manager-plugin
+```
+ 
+Connect to the container
+```sh
+aws ecs execute-command  \
+--region $AWS_DEFAULT_REGION \
+--cluster cruddur \
+--task dceb2ebdc11c49caadd64e6521c6b0c7 \
+--container backend-flask \
+--command "/bin/bash" \
+--interactive
+```
+
+```sh
+docker run -rm \
+-p 4567:4567 \
+-e AWS_ENDPOINT_URL="http://dynamodb-local:8000" \
+-e CONNECTION_URL="postgresql://postgres:password@db:5432/cruddur" \
+-e FRONTEND_URL="https://3000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}" \
+-e BACKEND_URL="https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}" \
+-e OTEL_SERVICE_NAME='backend-flask' \
+-e OTEL_EXPORTER_OTLP_ENDPOINT="https://api.honeycomb.io" \
+-e OTEL_EXPORTER_OTLP_HEADERS="x-honeycomb-team=${HONEYCOMB_API_KEY}" \
+-e AWS_XRAY_URL="*4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}*" \
+-e AWS_XRAY_DAEMON_ADDRESS="xray-daemon:2000" \
+-e AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION}" \
+-e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" \
+-e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" \
+-e ROLLBAR_ACCESS_TOKEN="${ROLLBAR_ACCESS_TOKEN}" \
+-e AWS_COGNITO_USER_POOL_ID="${AWS_COGNITO_USER_POOL_ID}" \
+-e AWS_COGNITO_USER_POOL_CLIENT_ID="5b6ro31g97urk767adrbrdj1g5" \   
+-it backend-flask-prod
 ```
