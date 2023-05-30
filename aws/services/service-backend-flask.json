@@ -5,19 +5,30 @@
     "enableECSManagedTags": true,
     "enableExecuteCommand": true,
     "networkConfiguration": {
-        "awsvpcConfiguration": {
+      "awsvpcConfiguration": {
         "assignPublicIp": "ENABLED",
         "securityGroups": [
-            "sg-02d2be48c871d2a8d"
+          "sg-****************"
         ],
         "subnets": [
-            "subnet-0b686fbd5ca21fd99",
-            "subnet-0d4e0796cc6018b57",
-            "subnet-0ba34662f3e2d0d64"
+          "subnet-****************",
+          "subnet-****************",
+          "subnet-****************"
         ]
-        }
+      }
     },
     "propagateTags": "SERVICE",
     "serviceName": "backend-flask",
-    "taskDefinition": "backend-flask"
-} 
+    "taskDefinition": "backend-flask",
+    "serviceConnectConfiguration": {
+      "enabled": true,
+      "namespace": "cruddur",
+      "services": [
+        {
+          "portName": "backend-flask",
+          "discoveryName": "backend-flask",
+          "clientAliases": [{"port": 4567}]
+        }
+      ]
+    }
+  }
