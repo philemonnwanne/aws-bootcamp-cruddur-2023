@@ -564,6 +564,7 @@ session-manager-plugin
 ```
  
 Connect to the container
+
 ```sh
 aws ecs execute-command  \
 --region $AWS_DEFAULT_REGION \
