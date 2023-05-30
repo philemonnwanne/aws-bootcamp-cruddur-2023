@@ -298,7 +298,7 @@ In the aws directory create a json file `/policies/service-execution-role.json` 
 }
 ```
 
-Create the role
+Create the `CruddurServiceExecutionRole`
 
 ```sh
 aws iam create-role --role-name CruddurServiceExecutionRole --assume-role-policy-document file://aws/policies/service-execution-role.json
@@ -334,19 +334,15 @@ Now create another json file `/policies/service-execution-policy.json` and add t
 }
 ```
 
-Attach the roles policy
+Attach the `CruddurServiceExecutionPolicy` policy
 
 ```sh
 aws iam put-role-policy --policy-name CruddurServiceExecutionPolicy --role-name CruddurServiceExecutionRole --policy-document file://aws/policies/service-execution-policy.json
 ```
 
-```sh
-aws iam put-role-policy --policy-name CruddurCloudWatchFullAccess --role-name CruddurServiceExecutionRole --policy-document file://aws/policies/cloudwatch-full-access.json
-```
-
 #### Create TaskRole
 
-Create the role
+Create the `CruddurTaskRole`
 
 ```sh
 aws iam create-role \
@@ -363,7 +359,7 @@ aws iam create-role \
 }"
 ```
 
-Attach the roles policy
+Attach the `SSMAccessPolicy` policy
 
 ```sh
 aws iam put-role-policy \
@@ -387,17 +383,21 @@ aws iam put-role-policy \
 
 Attach the following policies for access to `CloudWatch` and `X-Ray`
 
+`CloudWatchFullAccess` policy
+
 ```sh
 aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/CloudWatchFullAccess --role-name CruddurTaskRole
 ```
+
+`AWSXRayDaemonWriteAccess` policy
 
 ```sh
 aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess --role-name CruddurTaskRole
 ```
 
-### Create Json file
+### Create Task Definitions
 
-Create a new folder called `aws/task-defintions` and place the following files in there:
+Create a new folder called `aws/task-defintions` and place the following file in there:
 
 `backend-flask.json`
 
@@ -454,7 +454,7 @@ Create a new folder called `aws/task-defintions` and place the following files i
 
 ### Register Task Defintion
 
-Create task definition for the backend
+Register the task definition for the backend
 
 ```sh
 aws ecs register-task-definition --cli-input-json file://aws/task-definitions/backend-flask.json
