@@ -472,7 +472,7 @@ export CRUDDUR_VPC_ID=$(aws ec2 describe-vpcs \
 echo $CRUDDUR_VPC_ID
 ```
 
-<!-- Export `Subnet` id
+<!-- Grab the `Subnet` ids
 
 ```sh
 export CRUDDUR_SUBNET_ID=$(aws ec2 describe-subnets  \
@@ -515,7 +515,7 @@ aws ec2 authorize-security-group-ingress \
 
 ### Extras
 
-Fix docker push error (denied: Your authorization token has expired. Reauthenticate and try again.)
+<!-- Fix docker push error (denied: Your authorization token has expired. Reauthenticate and try again.)
 
 ```sh
 aws ecr get-login-password \
@@ -523,18 +523,18 @@ aws ecr get-login-password \
 | docker login \
     --username AWS \
     --password-stdin <aws_account_id>.dkr.ecr.<region>.amazonaws.com
-```
+``` -->
 
-## Not able to use Sessions Manager to get into cluster EC2 sintance
+### Not able to use Sessions Manager to get into cluster EC2 sintance
 
-The instance can hang up for various reasons.
-You need to reboot and it will force a restart after 5 minutes
+The instance can hang up for various reasons. 
+You need to reboot and it will force a restart after 5 minutes. 
 So you will have to wait 5 minutes or after a timeout.
 
 You have to use the AWS CLI. 
-You can't use the `AWS Console`. it will not work as expected.
+You can't use the `AWS Console`, it will not work as expected.
 
-The console will only do a graceful shutdodwn
+The console will only do a graceful shutdodwn. 
 The CLI will do a forceful shutdown after a period of time if graceful shutdown fails.
 
 ```sh
@@ -570,9 +570,22 @@ aws ecs execute-command  \
 --cluster cruddur \
 --task dceb2ebdc11c49caadd64e6521c6b0c7 \
 --container backend-flask \
---command "/bin/bash" \
+--command "/bin/sh" \
 --interactive
 ```
+
+### Create Services
+
+While in the `project` directory
+
+```sh
+aws ecs create-service --cli-input-json file://aws/services/service-backend-flask.json
+```
+
+<!-- ```sh
+aws ecs create-service --cli-input-json file://aws/services/service-frontend-react-js.json
+``` -->
+
 
 ```sh
 docker run -rm \
