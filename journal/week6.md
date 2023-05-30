@@ -509,7 +509,7 @@ Add ingress rule
 aws ec2 authorize-security-group-ingress \
   --group-id $CRUD_SERVICE_SG \
   --protocol tcp \
-  --port 80 \
+  --port 4567 \
   --cidr 0.0.0.0/0
 ```
 
@@ -562,18 +562,6 @@ Verify that the installation was successful
 ```sh
 session-manager-plugin
 ```
- 
-Connect to the container
-
-```sh
-aws ecs execute-command  \
---region $AWS_DEFAULT_REGION \
---cluster cruddur \
---task dceb2ebdc11c49caadd64e6521c6b0c7 \
---container backend-flask \
---command "/bin/sh" \
---interactive
-```
 
 ### Create Services
 
@@ -586,6 +574,60 @@ aws ecs create-service --cli-input-json file://aws/services/service-backend-flas
 <!-- ```sh
 aws ecs create-service --cli-input-json file://aws/services/service-frontend-react-js.json
 ``` -->
+
+### Connect to the container
+
+```sh
+aws ecs execute-command  \
+--region $AWS_DEFAULT_REGION \
+--cluster cruddur \
+--task dceb2ebdc11c49caadd64e6521c6b0c7 \
+--container backend-flask \
+--command "/bin/sh" \
+--interactive
+```
+
+### Connect to the container (script)
+
+In the backend directory, create a new script `bin/ecs/connect-to-ecs` so we can easily login to our ecs container.
+
+```sh
+# Script compatible with both zsh and bash shells
+#!/usr/bin/env bash
+set -e # stop if it fails at any point
+
+if [ -z "$1" ]; then
+  echo "No TASK_ID argument was supplied eg .bin/ecs/connect-to-ecs b0f2a4f926b545b9b99992b0eefc5860 backend-flask"
+  exit 1
+fi
+TASK_ID=$1
+
+if [ -z "$2" ]; then
+  echo "No CONTAINER_NAME argument was supplied eg .bin/ecs/connect-to-ecs b0f2a4f926b545b9b99992b0eefc5860 backend-flask"
+  exit 1
+fi
+CONTAINER_NAME=$2
+
+aws ecs execute-command  \
+--region $AWS_DEFAULT_REGION \
+--cluster cruddur \
+--task $TASK_ID \
+--container $CONTAINER_NAME \
+--command "/bin/sh" \
+--interactive
+```
+
+We will make it executable:
+
+```bash
+chmod 744 bin/ecs/connect-to-ecs
+```
+
+To execute the script:
+
+```bash
+./bin/ecs/connect-to-ecs
+```
 
 
 ```sh
