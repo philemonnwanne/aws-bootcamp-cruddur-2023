@@ -514,7 +514,7 @@ aws ec2 authorize-security-group-ingress \
 ```
 
 ### Extras
-
+<!-- This has been done earlier 👆🏾  -->
 <!-- Fix docker push error (denied: Your authorization token has expired. Reauthenticate and try again.)
 
 ```sh
@@ -629,8 +629,7 @@ To execute the script:
 ./bin/ecs/connect-to-ecs
 ```
 
-
-```sh
+<!-- ```sh
 docker run -rm \
 -p 4567:4567 \
 -e AWS_ENDPOINT_URL="http://dynamodb-local:8000" \
@@ -649,4 +648,82 @@ docker run -rm \
 -e AWS_COGNITO_USER_POOL_ID="${AWS_COGNITO_USER_POOL_ID}" \
 -e AWS_COGNITO_USER_POOL_CLIENT_ID="5b6ro31g97urk767adrbrdj1g5" \   
 -it backend-flask-prod
+``` -->
+
+# Connecting via a load balancer
+
+### Create Security Group
+
+Export `VPC` id for the `VPC` name tag `cruddur-vpc`
+
+```sh
+export CRUDDUR_VPC_ID=$(aws ec2 describe-vpcs \
+--filters "Name=tag:Name, Values=cruddur-vpc" \
+--query "Vpcs[].VpcId" \
+--output text)
+echo $CRUDDUR_VPC_ID
+```
+
+<!-- Grab the `Subnet` ids
+
+```sh
+export CRUDDUR_SUBNET_ID=$(aws ec2 describe-subnets  \
+--filters "Name=vpc-id, Values=$CRUDDUR_VPC_ID" \
+--query 'Subnets[*].SubnetId' \
+--output json | jq -r 'join(",")')
+echo $CRUDDUR_SUBNET_ID
+``` -->
+
+Create security group for the ALB
+
+```sh
+export CRUD_ALB_SG=$(aws ec2 create-security-group \
+  --group-name "crud-alb-sg" \
+  --description "Security group for Cruddur ALB on ECS" \
+  --vpc-id $CRUDDUR_VPC_ID \
+  --query "GroupId" --output text)
+echo $CRUD_ALB_SG
+```
+
+Describe security group (if it already exists)
+
+<!-- ```sh
+export CRUD_ALB_SG=$(aws ec2 describe-security-groups \
+  --filters "Name=vpc-id, Values=$CRUDDUR_VPC_ID" \
+  --query "SecurityGroups[*].{ID:GroupId}" \
+  --output text)
+echo $CRUD_ALB_SG
+``` -->
+
+```sh
+aws ec2 authorize-security-group-ingress --group-id $CRUD_ALB_SG --ip-permissions IpProtocol=tcp,FromPort=80,ToPort=80,IpRanges="[{CidrIp=0.0.0.0/0,Description=allow http access}]" IpProtocol=tcp,FromPort=443,ToPort=443,IpRanges="[{CidrIp=0.0.0.0/0,Description=allow secure access}]"
+```
+
+Revoke previous ingress rule for the `crud-srv-sg`
+
+```sh
+aws ec2 revoke-security-group-ingress \
+    --group-name $CRUD_SERVICE_SG
+    --protocol tcp \
+    --port 80 \
+    --cidr 0.0.0.0/0
+```
+
+Update ingress rule for the `crud-srv-sg`
+
+```sh
+aws ec2 authorize-security-group-ingress \
+  --group-id $CRUD_SERVICE_SG \
+  --description "access from crudder ALB" \
+  --protocol tcp \
+  --port 4567 \
+  --source-group $CRUD_ALB_SG
+```
+
+```sh
+aws ec2 authorize-security-group-ingress --group-id sg-02d2be48c871d2a8d --ip-permissions IpProtocol=tcp,FromPort=4567,ToPort=4567,IpRanges="[{CidrIp=$CRUD_ALB_SG,Description=access from crudder ALB}]"
+```
+
+```sh
+aws ec2 authorize-security-group-ingress --group-id sg-02d2be48c871d2a8d --ip-permissions IpProtocol=tcp,FromPort=4567,ToPort=4567,IpRanges="[{CidrIp=sg-0fa52a29d6d0199db,Description=access from crudder ALB}]"
 ```
