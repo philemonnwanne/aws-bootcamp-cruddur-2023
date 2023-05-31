@@ -724,6 +724,63 @@ aws ec2 authorize-security-group-ingress \
 aws ec2 authorize-security-group-ingress --group-id sg-02d2be48c871d2a8d --ip-permissions IpProtocol=tcp,FromPort=4567,ToPort=4567,IpRanges="[{CidrIp=$CRUD_ALB_SG,Description=access from crudder ALB}]"
 ```
 
+<!-- ```sh
+aws ec2 authorize-security-group-ingress --group-id sg-02d2be48c871d2a8d --ip-permissions IpProtocol=tcp,FromPort=4567,ToPort=4567,UserIdGroupPairs='[{GroupId=sg-0fa52a29d6d0199db,Description="access from crudder ALB"}]'
+``` -->
+
+### Create a Load Balancer
+
+Create load balancer
+
 ```sh
-aws ec2 authorize-security-group-ingress --group-id sg-02d2be48c871d2a8d --ip-permissions IpProtocol=tcp,FromPort=4567,ToPort=4567,IpRanges="[{CidrIp=sg-0fa52a29d6d0199db,Description=access from crudder ALB}]"
+export CRUDDUR_ALB_ARN=$(aws elb create-load-balancer \
+--load-balancer-name cruddur-alb \
+--listeners "Protocol=HTTP,LoadBalancerPort=80,InstanceProtocol=HTTP,InstancePort=80" \
+# --subnets subnet-0b686fbd5ca21fd99 subnet-0d4e0796cc6018b57 subnet-0ba34662f3e2d0d64 \
+--security-groups sg-02d2be48c871d2a8d \
+--output text)
+echo $CRUDDUR_ALB_ARN
 ```
+
+Create `backend-flask` target group
+
+```sh
+export CRUDDUR_BACKEND_FLASK_TARGETS=$(
+aws elbv2 create-target-group \
+--name cruddur-backend-flask-targets \
+--protocol HTTP \
+--port 80 \
+--vpc-id $CRUDDUR_VPC_ID \
+--ip-address-type ipv4 \
+--target-type ip \
+--query "TargetGroups[*].TargetGroupArn" \
+--output text)
+echo $CRUDDUR_BACKEND_FLASK_TARGETS
+```
+
+Regsiter Targets
+
+```sh
+aws elbv2 register-targets --target-group-arn $CRUDDUR_BACKEND_FLASK_TARGETS  \
+--targets Id=192.98.76.90 Id=10.0.6.1 \
+--output text \
+--color on
+```
+
+Create listener
+
+```sh
+aws elbv2 create-listener --load-balancer-arn $CRUDDUR_ALB_ARN \
+--protocol HTTP --port 80  \
+--default-actions Type=forward,TargetGroupArn=$CRUDDUR_BACKEND_FLASK_TARGETS \
+--output text \
+--color on
+```
+
+<!-- ```sh
+aws elbv2 create-load-balancer \
+--name cruddur-alb  \
+--subnets subnet-0b686fbd5ca21fd99 subnet-0d4e0796cc6018b57 subnet-0ba34662f3e2d0d64 \
+--security-groups sg-02d2be48c871d2a8d \
+--color on
+``` -->
