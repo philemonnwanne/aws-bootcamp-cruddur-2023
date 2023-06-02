@@ -780,15 +780,7 @@ aws elbv2 create-listener --load-balancer-arn $CRUDDUR_ALB_ARN \
 --color on
 ```
 
-<!-- ```sh
-aws elbv2 create-load-balancer \
---name cruddur-alb  \
---subnets subnet-0b686fbd5ca21fd99 subnet-0d4e0796cc6018b57 subnet-0ba34662f3e2d0d64 \
---security-groups sg-02d2be48c871d2a8d \
---color on
-``` -->
-
-### Generate aws cli skeleton
+### Generate sample aws cli skeleton
 
 ```sh
 aws ec2 describe-security-groups --generate-cli-skeleton
