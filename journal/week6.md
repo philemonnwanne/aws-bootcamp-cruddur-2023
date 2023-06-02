@@ -750,7 +750,7 @@ Create `backend-flask` target group
 ```sh
 export CRUDDUR_BACKEND_FLASK_TARGETS=$(
 aws elbv2 create-target-group \
---name cruddur-backend-flask-targets \
+--name cruddur-backend-flask-tg \
 --protocol HTTP \
 --port 80 \
 --vpc-id $CRUDDUR_VPC_ID \
