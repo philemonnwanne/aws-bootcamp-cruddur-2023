@@ -733,6 +733,19 @@ aws ec2 authorize-security-group-ingress --group-id $CRUD_SERVICE_SG --ip-permis
 
 ### Create a Load Balancer
 
+Create load balancer
+
+```sh
+export CRUDDUR_ALB_ARN=$(aws elbv2 create-load-balancer \
+--name cruddur-alb \
+--scheme internet-facing \
+--subnets $CRUDDUR_SUBNET_ID \
+--security-groups $CRUD_ALB_SG \
+--query "LoadBalancers[*].LoadBalancerArn" \
+--output text)
+echo $CRUDDUR_ALB_ARN
+```
+
 Create the `backend-flask` target group
 
 ```sh
@@ -749,20 +762,23 @@ aws elbv2 create-target-group \
 echo $CRUDDUR_BACKEND_FLASK_TARGETS
 ```
 
-Create load balancer
+Create the `frontend-react` target group
 
 ```sh
-export CRUDDUR_ALB_ARN=$(aws elbv2 create-load-balancer \
---name cruddur-alb \
---scheme internet-facing \
---subnets $CRUDDUR_SUBNET_ID \
---security-groups $CRUD_ALB_SG \
---query "LoadBalancers[*].LoadBalancerArn" \
+export CRUDDUR_FRONTEND_REACT_TARGETS=$(
+aws elbv2 create-target-group \
+--name cruddur-backend-flask-tg \
+--protocol HTTP \
+--port 80 \
+--vpc-id $CRUDDUR_VPC_ID \
+--ip-address-type ipv4 \
+--target-type ip \
+--query "TargetGroups[*].TargetGroupArn" \
 --output text)
-echo $CRUDDUR_ALB_ARN
+echo $CRUDDUR_FRONTEND_REACT_TARGETS
 ```
 
-Create listener
+Create listener for the `backend-flask` target group
 
 ```sh
 aws elbv2 create-listener --load-balancer-arn $CRUDDUR_ALB_ARN \
@@ -772,10 +788,29 @@ aws elbv2 create-listener --load-balancer-arn $CRUDDUR_ALB_ARN \
 --color on
 ```
 
-Regsiter Targets
+Regsiter Targets for the `backend-flask` target group
 
 ```sh
 aws elbv2 register-targets --target-group-arn $CRUDDUR_BACKEND_FLASK_TARGETS  \
+--targets Id=192.98.76.90 Id=10.0.6.1 \
+--output text \
+--color on
+```
+
+Create listener for the `frontend-react` target group
+
+```sh
+aws elbv2 create-listener --load-balancer-arn $CRUDDUR_ALB_ARN \
+--protocol HTTP --port 80  \
+--default-actions Type=forward,TargetGroupArn=$CRUDDUR_FRONTEND_REACT_TARGETS \
+--output text \
+--color on
+```
+
+Regsiter Targets for the `frontend-react` target group
+
+```sh
+aws elbv2 register-targets --target-group-arn $CRUDDUR_FRONTEND_REACT_TARGETS  \
 --targets Id=192.98.76.90 Id=10.0.6.1 \
 --output text \
 --color on
