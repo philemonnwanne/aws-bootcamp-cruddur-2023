@@ -733,19 +733,7 @@ aws ec2 authorize-security-group-ingress --group-id $CRUD_SERVICE_SG --ip-permis
 
 ### Create a Load Balancer
 
-Create load balancer
-
-```sh
-export CRUDDUR_ALB_ARN=$(aws elb create-load-balancer \
---load-balancer-name cruddur-alb \
---listeners "Protocol=HTTP,LoadBalancerPort=80,InstanceProtocol=HTTP,InstancePort=80" \
-# --subnets subnet-0b686fbd5ca21fd99 subnet-0d4e0796cc6018b57 subnet-0ba34662f3e2d0d64 \
---security-groups sg-02d2be48c871d2a8d \
---output text)
-echo $CRUDDUR_ALB_ARN
-```
-
-Create `backend-flask` target group
+Create the `backend-flask` target group
 
 ```sh
 export CRUDDUR_BACKEND_FLASK_TARGETS=$(
@@ -761,13 +749,17 @@ aws elbv2 create-target-group \
 echo $CRUDDUR_BACKEND_FLASK_TARGETS
 ```
 
-Regsiter Targets
+Create load balancer
 
 ```sh
-aws elbv2 register-targets --target-group-arn $CRUDDUR_BACKEND_FLASK_TARGETS  \
---targets Id=192.98.76.90 Id=10.0.6.1 \
---output text \
---color on
+export CRUDDUR_ALB_ARN=$(aws elbv2 create-load-balancer \
+--name cruddur-alb \
+--scheme internet-facing \
+--subnets $CRUDDUR_SUBNET_ID \
+--security-groups $CRUD_ALB_SG \
+--query "LoadBalancers[*].LoadBalancerArn" \
+--output text)
+echo $CRUDDUR_ALB_ARN
 ```
 
 Create listener
@@ -776,6 +768,15 @@ Create listener
 aws elbv2 create-listener --load-balancer-arn $CRUDDUR_ALB_ARN \
 --protocol HTTP --port 80  \
 --default-actions Type=forward,TargetGroupArn=$CRUDDUR_BACKEND_FLASK_TARGETS \
+--output text \
+--color on
+```
+
+Regsiter Targets
+
+```sh
+aws elbv2 register-targets --target-group-arn $CRUDDUR_BACKEND_FLASK_TARGETS  \
+--targets Id=192.98.76.90 Id=10.0.6.1 \
 --output text \
 --color on
 ```
