@@ -497,7 +497,7 @@ Describe security group (if it already exists)
 
 ```sh
 export CRUD_SERVICE_SG=$(aws ec2 describe-security-groups \
-  --filters "Name=vpc-id, Values=$CRUDDUR_VPC_ID" \
+  --filters "Name=group-name, Values=crud-srv-sg" \
   --query "SecurityGroups[*].{ID:GroupId}" \
   --output text)
 echo $CRUD_SERVICE_SG
@@ -542,6 +542,8 @@ aws ec2 reboot-instances --instance-ids i-0d15aef0618733b6d
 ```
 
 ### Connection via Sessions Manaager (Fargate)
+
+`Note:` Add these commands to `gitpod.yml`
 
 [Install the Session Manager plugin on Debian](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html#install-plugin-debian)
 
@@ -664,15 +666,20 @@ export CRUDDUR_VPC_ID=$(aws ec2 describe-vpcs \
 echo $CRUDDUR_VPC_ID
 ```
 
-<!-- Grab the `Subnet` ids
+Grab the `public subnet` ids
 
-```sh
+<!-- ```sh
 export CRUDDUR_SUBNET_ID=$(aws ec2 describe-subnets  \
---filters "Name=vpc-id, Values=$CRUDDUR_VPC_ID" \
+--filters "Name=vpc-id, Values=$CRUDDUR_VPC_ID" "Name=tag:Name, Values=cruddur-subnet-public3-us-east-1c" \
 --query 'Subnets[*].SubnetId' \
 --output json | jq -r 'join(",")')
 echo $CRUDDUR_SUBNET_ID
 ``` -->
+
+```sh
+export CRUDDUR_SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=vpc-id, Values=$CRUDDUR_VPC_ID" | jq -r '.Subnets[] | select(.Tags[].Value | contains("public")).SubnetId')
+echo $CRUDDUR_SUBNET_ID
+```
 
 Create security group for the ALB
 
@@ -689,7 +696,7 @@ Describe security group (if it already exists)
 
 <!-- ```sh
 export CRUD_ALB_SG=$(aws ec2 describe-security-groups \
-  --filters "Name=vpc-id, Values=$CRUDDUR_VPC_ID" \
+  --filters "Name=group-name, Values=crud-alb-sg" \
   --query "SecurityGroups[*].{ID:GroupId}" \
   --output text)
 echo $CRUD_ALB_SG
@@ -721,12 +728,8 @@ aws ec2 authorize-security-group-ingress \
 ```
 
 ```sh
-aws ec2 authorize-security-group-ingress --group-id sg-02d2be48c871d2a8d --ip-permissions IpProtocol=tcp,FromPort=4567,ToPort=4567,IpRanges="[{CidrIp=$CRUD_ALB_SG,Description=access from crudder ALB}]"
+aws ec2 authorize-security-group-ingress --group-id $CRUD_SERVICE_SG --ip-permissions IpProtocol=tcp,FromPort=4567,ToPort=4567,UserIdGroupPairs="[{GroupId=$CRUD_ALB_SG, Description=access from crudder ALB}]"
 ```
-
-<!-- ```sh
-aws ec2 authorize-security-group-ingress --group-id sg-02d2be48c871d2a8d --ip-permissions IpProtocol=tcp,FromPort=4567,ToPort=4567,UserIdGroupPairs='[{GroupId=sg-0fa52a29d6d0199db,Description="access from crudder ALB"}]'
-``` -->
 
 ### Create a Load Balancer
 
@@ -784,3 +787,9 @@ aws elbv2 create-load-balancer \
 --security-groups sg-02d2be48c871d2a8d \
 --color on
 ``` -->
+
+### Generate aws cli skeleton
+
+```sh
+aws ec2 describe-security-groups --generate-cli-skeleton
+```
