@@ -210,14 +210,14 @@ Create Repo
 
 ```sh
 aws ecr create-repository \
-  --repository-name frontend-react-js \
+  --repository-name frontend-react \
   --image-tag-mutability MUTABLE
 ```
 
 Set URL
 
 ```sh
-export ECR_FRONTEND_REACT_URL="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/frontend-react-js"
+export ECR_FRONTEND_REACT_URL="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/frontend-react"
 echo $ECR_FRONTEND_REACT_URL
 ```
 
@@ -230,7 +230,7 @@ docker build \
 --build-arg REACT_APP_AWS_COGNITO_REGION="$AWS_DEFAULT_REGION" \
 --build-arg REACT_APP_AWS_USER_POOLS_ID="ca-central-1_CQ4wDfnwc" \
 --build-arg REACT_APP_CLIENT_ID="5b6ro31g97urk767adrbrdj1g5" \
--t frontend-react-js \
+-t frontend-react \
 -f Dockerfile.prod \
 .
 ```
@@ -238,7 +238,7 @@ docker build \
 Tag Image
 
 ```sh
-docker tag frontend-react-js:latest $ECR_FRONTEND_REACT_URL:latest
+docker tag frontend-react:latest $ECR_FRONTEND_REACT_URL:latest
 ```
 
 Push Image
@@ -250,7 +250,7 @@ docker push $ECR_FRONTEND_REACT_URL:latest
 If you want to run and test it
 
 ```sh
-docker run --rm -p 3000:3000 -it frontend-react-js 
+docker run --rm -p 3000:3000 -it frontend-react 
 ```
 
 ## Register Task Defintions
@@ -574,7 +574,7 @@ aws ecs create-service --cli-input-json file://aws/services/service-backend-flas
 ```
 
 <!-- ```sh
-aws ecs create-service --cli-input-json file://aws/services/service-frontend-react-js.json
+aws ecs create-service --cli-input-json file://aws/services/service-frontend-react.json
 ``` -->
 
 ### Connect to the container
@@ -703,7 +703,7 @@ echo $CRUD_ALB_SG
 ``` -->
 
 ```sh
-aws ec2 authorize-security-group-ingress --group-id $CRUD_ALB_SG --ip-permissions IpProtocol=tcp,FromPort=80,ToPort=80,IpRanges="[{CidrIp=0.0.0.0/0,Description=allow http access}]" IpProtocol=tcp,FromPort=443,ToPort=443,IpRanges="[{CidrIp=0.0.0.0/0,Description=allow secure access}]"
+aws ec2 authorize-security-group-ingress --group-id $CRUD_ALB_SG --ip-permissions IpProtocol=tcp,FromPort=80,ToPort=80,IpRanges="[{CidrIp=0.0.0.0/0,Description=allow http access}]" IpProtocol=tcp,FromPort=443,ToPort=443,IpRanges="[{CidrIp=0.0.0.0/0,Description=allow secure access}]" IpProtocol=tcp,FromPort=4567,ToPort=4567,IpRanges="[{CidrIp=0.0.0.0/0,Description=allow access to the backend-target-group}]" IpProtocol=tcp,FromPort=3000,ToPort=3000,IpRanges="[{CidrIp=0.0.0.0/0,Description=allow access to the frontend-target-group}]"
 ```
 
 Revoke previous ingress rule for the `crud-srv-sg`
@@ -789,12 +789,12 @@ aws elbv2 register-targets --target-group-arn $CRUDDUR_BACKEND_FLASK_TARGETS  \
 --color on
 ```
 
-Create the `frontend-react-js` target group
+Create the `frontend-react` target group
 
 ```sh
 export CRUDDUR_FRONTEND_REACT_TARGETS=$(
 aws elbv2 create-target-group \
---name cruddur-frontend-react-js-tg \
+--name cruddur-frontend-react-tg \
 --protocol HTTP \
 --port 3000 \
 --vpc-id $CRUDDUR_VPC_ID \
@@ -805,7 +805,7 @@ aws elbv2 create-target-group \
 echo $CRUDDUR_FRONTEND_REACT_TARGETS
 ```
 
-Create listener for the `frontend-react-js` target group
+Create listener for the `frontend-react` target group
 
 ```sh
 aws elbv2 create-listener --load-balancer-arn $CRUDDUR_ALB_ARN \
@@ -820,10 +820,10 @@ aws elbv2 create-listener --load-balancer-arn $CRUDDUR_ALB_ARN \
 While in the `project` directory
 
 ```sh
-aws ecs create-service --cli-input-json file://aws/services/service-frontend-react-js.json
+aws ecs create-service --cli-input-json file://aws/services/service-frontend-react.json
 ```
 
-Regsiter Targets for the `frontend-react-js` target group
+Regsiter Targets for the `frontend-react` target group
 
 ```sh
 aws elbv2 register-targets --target-group-arn $CRUDDUR_FRONTEND_REACT_TARGETS  \

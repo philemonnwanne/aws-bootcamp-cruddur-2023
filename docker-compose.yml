@@ -13,7 +13,7 @@ services:
       REACT_APP_AWS_COGNITO_REGION: "${AWS_DEFAULT_REGION}"
       REACT_APP_AWS_USER_POOLS_ID: "${AWS_COGNITO_USER_POOL_ID}"
       REACT_APP_CLIENT_ID: "${AWS_COGNITO_USER_POOL_CLIENT_ID}"
-    build: ./frontend-react-js
+    build: ./frontend-react
     container_name: ${APP_NAME}-frontend
     ports:
       - "3000:3000"
@@ -24,8 +24,8 @@ services:
       start_period: 5s
       timeout: 10s
     volumes:
-      - ./frontend-react-js:/frontend-react-js
-      - /frontend-react-js/node_modules
+      - ./frontend-react:/frontend-react
+      - /frontend-react/node_modules
     networks:
       - ${APP_NAME}-network
 

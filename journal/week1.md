@@ -31,7 +31,7 @@
 
 Switch to the frontend directory and create a dockerfile
 ```bash
-cd frontend-react-js
+cd frontend-react
 
 nano Dockerfile
 ```
@@ -42,9 +42,9 @@ FROM node:16.18
 
 ENV PORT=3000
 
-COPY . /frontend-react-js
+COPY . /frontend-react
 
-WORKDIR /frontend-react-js
+WORKDIR /frontend-react
 
 RUN rm -rf node_modules \
     && npm install
@@ -100,13 +100,13 @@ services:
   frontend:
     environment:
       REACT_APP_BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
-    build: ./frontend-react-js
+    build: ./frontend-react
     container_name: frontend
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend-react-js:/frontend-react-js
-      - /frontend-react-js/node_modules
+      - ./frontend-react:/frontend-react
+      - /frontend-react/node_modules
     networks:
       - crudder-network
 
@@ -145,7 +145,7 @@ Switch to the frontend directory and edit the previous Dockerfile
 
 ```bash
 
-cd frontend-react-js
+cd frontend-react
 
 nano Dockerfile
 ```
@@ -156,7 +156,7 @@ Now edit the Dockerfile to look like the following
 # build image
 FROM node:16.17.0-bullseye-slim AS build
 
-WORKDIR /frontend-react-js
+WORKDIR /frontend-react
 
 COPY --chown=node:node package.json .
 
@@ -169,11 +169,11 @@ FROM node:lts-alpine3.17
 
 ENV NODE_ENV production
 
-WORKDIR /frontend-react-js
+WORKDIR /frontend-react
 
 USER node
 
-COPY --from=build /frontend-react-js/node_modules /frontend-react-js/node_modules
+COPY --from=build /frontend-react/node_modules /frontend-react/node_modules
 
 COPY --chown=node:node . .
 
@@ -311,10 +311,10 @@ Steps to recreate
 ```bash
 git clone https://github.com/philemonnwanne/aws-bootcamp-cruddur-2023.git crudder
 ```
-Switch to the project directory and into the `frontend-react-js` directory
+Switch to the project directory and into the `frontend-react` directory
 
 ```bash
-cd crudder/frontend-react-js
+cd crudder/frontend-react
 ```
 
 Create a Dockerfile and paste the contents of our previoud Dockerfile
@@ -336,7 +336,7 @@ services:
   frontend:
     environment:
       REACT_APP_BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
-    build: ./frontend-react-js
+    build: ./frontend-react
     container_name: frontend
     ports:
       - "3000:3000"
@@ -347,8 +347,8 @@ services:
       start_period: 5s
       timeout: 10s
     volumes:
-      - ./frontend-react-js:/frontend-react-js
-      - /frontend-react-js/node_modules
+      - ./frontend-react:/frontend-react
+      - /frontend-react/node_modules
     networks:
       - crudder-network
 
