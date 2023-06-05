@@ -1,0 +1,35 @@
+{
+    "family": "frontend-react",
+    "executionRoleArn": "arn:aws:iam::183066416469:role/CruddurServiceExecutionRole",
+    "taskRoleArn": "arn:aws:iam::183066416469:role/CruddurTaskRole",
+    "networkMode": "awsvpc",
+    "cpu": "256",
+    "memory": "512",
+    "requiresCompatibilities": [ 
+      "FARGATE" 
+    ],
+    "containerDefinitions": [
+      {
+        "name": "frontend-react",
+        "image": "183066416469.dkr.ecr.us-east-1.amazonaws.com/frontend-react",
+        "essential": true,
+        "portMappings": [
+          {
+            "name": "frontend-react",
+            "containerPort": 3000,
+            "protocol": "tcp", 
+            "appProtocol": "http"
+          }
+        ],
+  
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+              "awslogs-group": "cruddur-fargate-cluster",
+              "awslogs-region": "us-east-1",
+              "awslogs-stream-prefix": "frontend-react"
+          }
+        }
+      }
+    ]
+  }

@@ -395,9 +395,9 @@ aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/CloudWatchFullAc
 aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess --role-name CruddurTaskRole
 ```
 
-### Create Task Definitions
+### Create a Task Definition for the `Backend`
 
-Create a new folder called `aws/task-defintions` and place the following file in there:
+Create a new folder called `aws/task-definitions` and place the following file in there:
 
 `backend-flask.json`
 
@@ -832,7 +832,6 @@ aws elbv2 register-targets --target-group-arn $CRUDDUR_FRONTEND_REACT_TARGETS  \
 --color on
 ```
 
-
 ### Enable ALB access logs (Skip if you are concerned about spend/bills)
 
 Enable ALB access logs via the `console`
@@ -842,6 +841,59 @@ Enable ALB access logs via the `console`
 Enable ALB access logs via the `cli`
 
 [modify-load-balancer-attributes](https://docs.aws.amazon.com/cli/latest/reference/elbv2/modify-load-balancer-attributes.html)
+
+
+### Create a Task Definition for the `Frontend`
+
+Goto `aws/task-definitions` and place the following file in there:
+
+`frontend-react.json`
+
+```json
+{
+  "family": "frontend-react",
+  "executionRoleArn": "arn:aws:iam::183066416469:role/CruddurServiceExecutionRole",
+  "taskRoleArn": "arn:aws:iam::183066416469:role/CruddurTaskRole",
+  "networkMode": "awsvpc",
+  "cpu": "256",
+  "memory": "512",
+  "requiresCompatibilities": [ 
+    "FARGATE" 
+  ],
+  "containerDefinitions": [
+    {
+      "name": "frontend-react",
+      "image": "183066416469.dkr.ecr.us-east-1.amazonaws.com/frontend-react",
+      "essential": true,
+      "portMappings": [
+        {
+          "name": "frontend-react",
+          "containerPort": 3000,
+          "protocol": "tcp", 
+          "appProtocol": "http"
+        }
+      ],
+
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+            "awslogs-group": "cruddur-fargate-cluster",
+            "awslogs-region": "us-east-1",
+            "awslogs-stream-prefix": "frontend-react"
+        }
+      }
+    }
+  ]
+}
+```
+
+### Register Task Defintion
+
+Register the task definition for the frontend
+
+```sh
+aws ecs register-task-definition --cli-input-json file://aws/task-definitions/frontend-react.json
+```
 
 ### Generate sample aws cli skeleton
 
