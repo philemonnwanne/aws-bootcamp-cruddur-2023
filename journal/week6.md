@@ -753,7 +753,7 @@ export CRUDDUR_BACKEND_FLASK_TARGETS=$(
 aws elbv2 create-target-group \
 --name cruddur-backend-flask-tg \
 --protocol HTTP \
---port 80 \
+--port 4567 \
 --vpc-id $CRUDDUR_VPC_ID \
 --ip-address-type ipv4 \
 --target-type ip \
@@ -762,27 +762,11 @@ aws elbv2 create-target-group \
 echo $CRUDDUR_BACKEND_FLASK_TARGETS
 ```
 
-Create the `frontend-react` target group
-
-```sh
-export CRUDDUR_FRONTEND_REACT_TARGETS=$(
-aws elbv2 create-target-group \
---name cruddur-backend-flask-tg \
---protocol HTTP \
---port 80 \
---vpc-id $CRUDDUR_VPC_ID \
---ip-address-type ipv4 \
---target-type ip \
---query "TargetGroups[*].TargetGroupArn" \
---output text)
-echo $CRUDDUR_FRONTEND_REACT_TARGETS
-```
-
 Create listener for the `backend-flask` target group
 
 ```sh
 aws elbv2 create-listener --load-balancer-arn $CRUDDUR_ALB_ARN \
---protocol HTTP --port 80  \
+--protocol HTTP --port 4567  \
 --default-actions Type=forward,TargetGroupArn=$CRUDDUR_BACKEND_FLASK_TARGETS \
 --output text \
 --color on
@@ -795,6 +779,22 @@ aws elbv2 register-targets --target-group-arn $CRUDDUR_BACKEND_FLASK_TARGETS  \
 --targets Id=192.98.76.90 Id=10.0.6.1 \
 --output text \
 --color on
+```
+
+Create the `frontend-react` target group
+
+```sh
+export CRUDDUR_FRONTEND_REACT_TARGETS=$(
+aws elbv2 create-target-group \
+--name cruddur-frontend-react-tg \
+--protocol HTTP \
+--port 80 \
+--vpc-id $CRUDDUR_VPC_ID \
+--ip-address-type ipv4 \
+--target-type ip \
+--query "TargetGroups[*].TargetGroupArn" \
+--output text)
+echo $CRUDDUR_FRONTEND_REACT_TARGETS
 ```
 
 Create listener for the `frontend-react` target group
