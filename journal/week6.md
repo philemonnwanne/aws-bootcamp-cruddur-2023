@@ -718,14 +718,14 @@ aws ec2 revoke-security-group-ingress \
 
 Update ingress rule for the `crud-srv-sg`
 
-```sh
+<!-- ```sh
 aws ec2 authorize-security-group-ingress \
   --group-id $CRUD_SERVICE_SG \
   --description "access from crudder ALB" \
   --protocol tcp \
   --port 4567 \
   --source-group $CRUD_ALB_SG
-```
+``` -->
 
 ```sh
 aws ec2 authorize-security-group-ingress --group-id $CRUD_SERVICE_SG --ip-permissions IpProtocol=tcp,FromPort=4567,ToPort=4567,UserIdGroupPairs="[{GroupId=$CRUD_ALB_SG, Description=access from crudder ALB}]"
@@ -772,6 +772,14 @@ aws elbv2 create-listener --load-balancer-arn $CRUDDUR_ALB_ARN \
 --color on
 ```
 
+### Create the backend service
+
+While in the `project` directory
+
+```sh
+aws ecs create-service --cli-input-json file://aws/services/service-backend-flask.json
+```
+
 Regsiter Targets for the `backend-flask` target group
 
 ```sh
@@ -781,14 +789,14 @@ aws elbv2 register-targets --target-group-arn $CRUDDUR_BACKEND_FLASK_TARGETS  \
 --color on
 ```
 
-Create the `frontend-react` target group
+Create the `frontend-react-js` target group
 
 ```sh
 export CRUDDUR_FRONTEND_REACT_TARGETS=$(
 aws elbv2 create-target-group \
---name cruddur-frontend-react-tg \
+--name cruddur-frontend-react-js-tg \
 --protocol HTTP \
---port 80 \
+--port 3000 \
 --vpc-id $CRUDDUR_VPC_ID \
 --ip-address-type ipv4 \
 --target-type ip \
@@ -797,17 +805,25 @@ aws elbv2 create-target-group \
 echo $CRUDDUR_FRONTEND_REACT_TARGETS
 ```
 
-Create listener for the `frontend-react` target group
+Create listener for the `frontend-react-js` target group
 
 ```sh
 aws elbv2 create-listener --load-balancer-arn $CRUDDUR_ALB_ARN \
---protocol HTTP --port 80  \
+--protocol HTTP --port 3000  \
 --default-actions Type=forward,TargetGroupArn=$CRUDDUR_FRONTEND_REACT_TARGETS \
 --output text \
 --color on
 ```
 
-Regsiter Targets for the `frontend-react` target group
+### Create the frontend service
+
+While in the `project` directory
+
+```sh
+aws ecs create-service --cli-input-json file://aws/services/service-frontend-react-js.json
+```
+
+Regsiter Targets for the `frontend-react-js` target group
 
 ```sh
 aws elbv2 register-targets --target-group-arn $CRUDDUR_FRONTEND_REACT_TARGETS  \
