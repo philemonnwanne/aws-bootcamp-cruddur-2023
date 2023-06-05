@@ -832,6 +832,17 @@ aws elbv2 register-targets --target-group-arn $CRUDDUR_FRONTEND_REACT_TARGETS  \
 --color on
 ```
 
+
+### Enable ALB access logs (Skip if you are concerned about spend/bills)
+
+Enable ALB access logs via the `console`
+
+[enable-access-logging](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html)
+
+Enable ALB access logs via the `cli`
+
+[modify-load-balancer-attributes](https://docs.aws.amazon.com/cli/latest/reference/elbv2/modify-load-balancer-attributes.html)
+
 ### Generate sample aws cli skeleton
 
 ```sh
