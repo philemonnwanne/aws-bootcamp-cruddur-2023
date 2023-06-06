@@ -164,14 +164,14 @@ docker tag python:3.11.3-alpine $ECR_PYTHON_URL:3.11.3-alpine
 docker push $ECR_PYTHON_URL:3.11.3-alpine
 ```
 
-### For Flask
+### For Backend Flask
 
-In your flask dockerfile update the from to instead of using DockerHub's python image
+In your flask dockerfile update the `FROM` command, so instead of using DockerHub's python image
 you use your own eg.
 
 > remember to put the :latest tag on the end
 
-Create Repo
+Create ECR Repo for the backend
 
 ```sh
 aws ecr create-repository \
@@ -206,7 +206,7 @@ docker push $ECR_BACKEND_FLASK_URL
 
 ### For Frontend React
 
-Create Repo
+Create ECR Repo for the frontend
 
 ```sh
 aws ecr create-repository \
@@ -228,8 +228,8 @@ docker build \
 --build-arg REACT_APP_BACKEND_URL="https://4567-$GITPOD_WORKSPACE_ID.$GITPOD_WORKSPACE_CLUSTER_HOST" \
 --build-arg REACT_APP_AWS_PROJECT_REGION="$AWS_DEFAULT_REGION" \
 --build-arg REACT_APP_AWS_COGNITO_REGION="$AWS_DEFAULT_REGION" \
---build-arg REACT_APP_AWS_USER_POOLS_ID="ca-central-1_CQ4wDfnwc" \
---build-arg REACT_APP_CLIENT_ID="5b6ro31g97urk767adrbrdj1g5" \
+--build-arg REACT_APP_AWS_USER_POOLS_ID="" \
+--build-arg REACT_APP_CLIENT_ID="" \
 -t frontend-react \
 -f Dockerfile.prod \
 .
