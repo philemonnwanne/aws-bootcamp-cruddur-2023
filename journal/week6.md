@@ -120,14 +120,6 @@ aws ecs create-cluster \
 
 ### Gaining Access to ECS Fargate Container
 
-Create ECR repo and push image
-
-```sh
-aws ecr create-repository \
-  --repository-name cruddur-python \
-  --image-tag-mutability MUTABLE
-```
-
 ### Login to ECR
 
 > Always do this before pushing to ECR
@@ -136,15 +128,23 @@ aws ecr create-repository \
 aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
 ```
 
-#### Set URL
+### Build the base python image
+
+Create ECR repo for the python image
+
+```sh
+aws ecr create-repository \
+  --repository-name cruddur-python \
+  --image-tag-mutability MUTABLE
+```
+
+Set URL
 
 ```sh
 export ECR_PYTHON_URL="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/cruddur-python"
 
 echo $ECR_PYTHON_URL
 ```
-
-### For Base-image python
 
 #### Pull Image
 
@@ -164,9 +164,9 @@ docker tag python:3.11.3-alpine $ECR_PYTHON_URL:3.11.3-alpine
 docker push $ECR_PYTHON_URL:3.11.3-alpine
 ```
 
-### For Backend Flask
+### Build the backend image
 
-In your flask dockerfile update the `FROM` command, so instead of using DockerHub's python image
+`Note:` In your flask dockerfile update the `FROM` command, so instead of using DockerHub's python image
 you use your own eg.
 
 > remember to put the :latest tag on the end
@@ -204,7 +204,7 @@ Push Image
 docker push $ECR_BACKEND_FLASK_URL
 ```
 
-### For Frontend React
+### Build the frontend image
 
 Create ECR Repo for the frontend
 
@@ -228,8 +228,8 @@ docker build \
 --build-arg REACT_APP_BACKEND_URL="https://4567-$GITPOD_WORKSPACE_ID.$GITPOD_WORKSPACE_CLUSTER_HOST" \
 --build-arg REACT_APP_AWS_PROJECT_REGION="$AWS_DEFAULT_REGION" \
 --build-arg REACT_APP_AWS_COGNITO_REGION="$AWS_DEFAULT_REGION" \
---build-arg REACT_APP_AWS_USER_POOLS_ID="" \
---build-arg REACT_APP_CLIENT_ID="" \
+--build-arg REACT_APP_AWS_USER_POOLS_ID="us-east-1_M2UeJ9auI" \
+--build-arg REACT_APP_CLIENT_ID="5cj7ce7gvhr9fvevss7t6vfocs" \
 -t frontend-react \
 -f Dockerfile.prod \
 .
@@ -253,7 +253,7 @@ If you want to run and test it
 docker run --rm -p 3000:3000 -it frontend-react 
 ```
 
-## Register Task Defintions
+## Register Task Defintions for the backend
 
 ### Passing Senstive Data to Task Defintion
 
@@ -426,7 +426,7 @@ Create a new folder called `aws/task-definitions` and place the following file i
         "logDriver": "awslogs",
         "options": {
             "awslogs-group": "cruddur",
-            "awslogs-region": "ca-central-1",
+            "awslogs-region": "us-east-1",
             "awslogs-stream-prefix": "backend-flask"
         }
       },
@@ -702,6 +702,8 @@ export CRUD_ALB_SG=$(aws ec2 describe-security-groups \
 echo $CRUD_ALB_SG
 ``` -->
 
+Update ingress rule for the `crud-alb-sg` 
+
 ```sh
 aws ec2 authorize-security-group-ingress --group-id $CRUD_ALB_SG --ip-permissions IpProtocol=tcp,FromPort=80,ToPort=80,IpRanges="[{CidrIp=0.0.0.0/0,Description=allow http access}]" IpProtocol=tcp,FromPort=443,ToPort=443,IpRanges="[{CidrIp=0.0.0.0/0,Description=allow secure access}]" IpProtocol=tcp,FromPort=4567,ToPort=4567,IpRanges="[{CidrIp=0.0.0.0/0,Description=allow access to the backend-target-group}]" IpProtocol=tcp,FromPort=3000,ToPort=3000,IpRanges="[{CidrIp=0.0.0.0/0,Description=allow access to the frontend-target-group}]"
 ```
@@ -772,6 +774,71 @@ aws elbv2 create-listener --load-balancer-arn $CRUDDUR_ALB_ARN \
 --color on
 ```
 
+### Create a Task Definition for the `Backend`
+
+Create a new folder called `aws/task-definitions` and place the following file in there:
+
+`backend-flask.json`
+
+```json
+{
+  "family": "backend-flask",
+  "executionRoleArn": "arn:aws:iam::AWS_ACCOUNT_ID:role/CruddurServiceExecutionRole",
+  "taskRoleArn": "arn:aws:iam::AWS_ACCOUNT_ID:role/CruddurTaskRole",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "backend-flask",
+      "image": "BACKEND_FLASK_IMAGE_URL",
+      "cpu": 256,
+      "memory": 512,
+      "essential": true,
+      "portMappings": [
+        {
+          "name": "backend-flask",
+          "containerPort": 4567,
+          "protocol": "tcp", 
+          "appProtocol": "http"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+            "awslogs-group": "cruddur",
+            "awslogs-region": "us-east-1",
+            "awslogs-stream-prefix": "backend-flask"
+        }
+      },
+      "environment": [
+        {"name": "OTEL_SERVICE_NAME", "value": "backend-flask"},
+        {"name": "OTEL_EXPORTER_OTLP_ENDPOINT", "value": "https://api.honeycomb.io"},
+        {"name": "AWS_COGNITO_USER_POOL_ID", "value": ""},
+        {"name": "AWS_COGNITO_USER_POOL_CLIENT_ID", "value": ""},
+        {"name": "FRONTEND_URL", "value": ""},
+        {"name": "BACKEND_URL", "value": ""},
+        {"name": "AWS_DEFAULT_REGION", "value": ""}
+      ],
+      "secrets": [
+        {"name": "AWS_ACCESS_KEY_ID"    , "valueFrom": "arn:aws:ssm:AWS_REGION:AWS_ACCOUNT_ID:parameter/cruddur/backend-flask/AWS_ACCESS_KEY_ID"},
+        {"name": "AWS_SECRET_ACCESS_KEY", "valueFrom": "arn:aws:ssm:AWS_REGION:AWS_ACCOUNT_ID:parameter/cruddur/backend-flask/AWS_SECRET_ACCESS_KEY"},
+        {"name": "CONNECTION_URL"       , "valueFrom": "arn:aws:ssm:AWS_REGION:AWS_ACCOUNT_ID:parameter/cruddur/backend-flask/CONNECTION_URL" },
+        {"name": "ROLLBAR_ACCESS_TOKEN" , "valueFrom": "arn:aws:ssm:AWS_REGION:AWS_ACCOUNT_ID:parameter/cruddur/backend-flask/ROLLBAR_ACCESS_TOKEN" },
+        {"name": "OTEL_EXPORTER_OTLP_HEADERS" , "valueFrom": "arn:aws:ssm:AWS_REGION:AWS_ACCOUNT_ID:parameter/cruddur/backend-flask/OTEL_EXPORTER_OTLP_HEADERS" }
+        
+      ]
+    }
+  ]
+}
+```
+
+### Register Task Defintion
+
+Register the task definition for the backend
+
+```sh
+aws ecs register-task-definition --cli-input-json file://aws/task-definitions/backend-flask.json
+```
+
 ### Create the backend service
 
 While in the `project` directory
@@ -815,14 +882,6 @@ aws elbv2 create-listener --load-balancer-arn $CRUDDUR_ALB_ARN \
 --color on
 ```
 
-### Create the frontend service
-
-While in the `project` directory
-
-```sh
-aws ecs create-service --cli-input-json file://aws/services/service-frontend-react.json
-```
-
 Regsiter Targets for the `frontend-react` target group
 
 ```sh
@@ -832,16 +891,54 @@ aws elbv2 register-targets --target-group-arn $CRUDDUR_FRONTEND_REACT_TARGETS  \
 --color on
 ```
 
-### Enable ALB access logs (Skip if you are concerned about spend/bills)
+### Build the frontend image
 
-Enable ALB access logs via the `console`
+Create ECR Repo for the frontend
 
-[enable-access-logging](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html)
+```sh
+aws ecr create-repository \
+  --repository-name frontend-react \
+  --image-tag-mutability MUTABLE
+```
 
-Enable ALB access logs via the `cli`
+Set URL
 
-[modify-load-balancer-attributes](https://docs.aws.amazon.com/cli/latest/reference/elbv2/modify-load-balancer-attributes.html)
+```sh
+export ECR_FRONTEND_REACT_URL="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/frontend-react"
+echo $ECR_FRONTEND_REACT_URL
+```
 
+Build Image
+
+```sh
+docker build \
+--build-arg REACT_APP_BACKEND_URL="$CRUDDUR_ALB_ARN" \
+--build-arg REACT_APP_AWS_PROJECT_REGION="$AWS_DEFAULT_REGION" \
+--build-arg REACT_APP_AWS_COGNITO_REGION="$AWS_DEFAULT_REGION" \
+--build-arg REACT_APP_AWS_USER_POOLS_ID="$AWS_COGNITO_USER_POOL_ID" \
+--build-arg REACT_APP_CLIENT_ID="$AWS_COGNITO_USER_POOL_CLIENT_ID" \
+-t frontend-react \
+-f Dockerfile.prod \
+.
+```
+
+Tag Image
+
+```sh
+docker tag frontend-react:latest $ECR_FRONTEND_REACT_URL:latest
+```
+
+Push Image
+
+```sh
+docker push $ECR_FRONTEND_REACT_URL:latest
+```
+
+If you want to run and test it
+
+```sh
+docker run --rm -p 3000:3000 -it frontend-react 
+```
 
 ### Create a Task Definition for the `Frontend`
 
@@ -889,14 +986,34 @@ Goto `aws/task-definitions` and place the following file in there:
 
 ### Register Task Defintion
 
-Register the task definition for the frontend
+While in the `project` directory run
 
 ```sh
 aws ecs register-task-definition --cli-input-json file://aws/task-definitions/frontend-react.json
 ```
+
+### Create the frontend service
+
+While in the `project` directory
+
+```sh
+aws ecs create-service --cli-input-json file://aws/services/service-frontend-react.json
+```
+
+## Ext[ras](#)
 
 ### Generate sample aws cli skeleton
 
 ```sh
 aws ec2 describe-security-groups --generate-cli-skeleton
 ```
+
+### Enable ALB access logs (Skip if you are concerned about spend/bills)
+
+Enable ALB access logs via the `console`
+
+[enable-access-logging](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html)
+
+Enable ALB access logs via the `cli`
+
+[modify-load-balancer-attributes](https://docs.aws.amazon.com/cli/latest/reference/elbv2/modify-load-balancer-attributes.html)
