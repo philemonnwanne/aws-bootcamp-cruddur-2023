@@ -15,26 +15,26 @@
           "subnet-****************",
           "subnet-****************"
         ]
-      }
-    },
+        }
+      },
     "propagateTags": "SERVICE",
-    "serviceName": "backend-flask",
-    "taskDefinition": "backend-flask",
+    "serviceName": "frontend-react",
+    "taskDefinition": "frontend-react",
     "loadBalancers": [
-      {
-          "targetGroupArn": "<backend-targetGroupArn>",
-          "containerName": "backend-flask",
-          "containerPort": 4567
-      }
-    ],
+        {
+            "targetGroupArn": "<frontend-targetGroupArn>",
+            "containerName": "frontend-react",
+            "containerPort": 3000
+        }
+      ],
     "serviceConnectConfiguration": {
       "enabled": true,
       "namespace": "cruddur",
       "services": [
         {
-          "portName": "backend-flask",
-          "discoveryName": "backend-flask",
-          "clientAliases": [{"port": 4567}]
+          "portName": "frontend-react",
+          "discoveryName": "frontend-react",
+          "clientAliases": [{"port": 3000}]
         }
       ]
     }

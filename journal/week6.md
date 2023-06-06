@@ -748,6 +748,19 @@ export CRUDDUR_ALB_ARN=$(aws elbv2 create-load-balancer \
 echo $CRUDDUR_ALB_ARN
 ```
 
+Describe load balancer (if it already exists)
+
+```sh
+export CRUDDUR_ALB_DNS=$(aws elbv2 describe-load-balancers \
+--load-balancer-arns $CRUDDUR_ALB_ARN \
+--query "LoadBalancers[*].DNSName" \
+--output text)
+echo "~~~~~~~~~"
+echo  OUTPUT 👾
+echo "~~~~~~~~~"
+echo http://$CRUDDUR_ALB_DNS:4567
+```
+
 Create the `backend-flask` target group
 
 ```sh
@@ -912,7 +925,7 @@ Build Image
 
 ```sh
 docker build \
---build-arg REACT_APP_BACKEND_URL="$CRUDDUR_ALB_ARN" \
+--build-arg REACT_APP_BACKEND_URL="http://$CRUDDUR_ALB_DNS:4567" \
 --build-arg REACT_APP_AWS_PROJECT_REGION="$AWS_DEFAULT_REGION" \
 --build-arg REACT_APP_AWS_COGNITO_REGION="$AWS_DEFAULT_REGION" \
 --build-arg REACT_APP_AWS_USER_POOLS_ID="$AWS_COGNITO_USER_POOL_ID" \
@@ -925,13 +938,21 @@ docker build \
 Tag Image
 
 ```sh
-docker tag frontend-react:latest $ECR_FRONTEND_REACT_URL:latest
+docker tag frontend-react:latest $ECR_FRONTEND_REACT_URL
+```
+
+#### Login to ECR
+
+> Always do this before pushing to ECR
+
+```bash
+aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
 ```
 
 Push Image
 
 ```sh
-docker push $ECR_FRONTEND_REACT_URL:latest
+docker push $ECR_FRONTEND_REACT_URL
 ```
 
 If you want to run and test it
