@@ -694,13 +694,13 @@ echo $CRUD_ALB_SG
 
 Describe security group (if it already exists)
 
-<!-- ```sh
+```sh
 export CRUD_ALB_SG=$(aws ec2 describe-security-groups \
   --filters "Name=group-name, Values=crud-alb-sg" \
   --query "SecurityGroups[*].{ID:GroupId}" \
   --output text)
 echo $CRUD_ALB_SG
-``` -->
+```
 
 Update ingress rule for the `crud-alb-sg` 
 
@@ -751,14 +751,14 @@ echo $CRUDDUR_ALB_ARN
 Describe load balancer (if it already exists)
 
 ```sh
-export CRUDDUR_ALB_DNS=$(aws elbv2 describe-load-balancers \
---load-balancer-arns $CRUDDUR_ALB_ARN \
+export CRUDDUR_ALB_DNS=http://$(aws elbv2 describe-load-balancers \
+--names cruddur-alb \
 --query "LoadBalancers[*].DNSName" \
---output text)
+--output text):4567
 echo "~~~~~~~~~"
 echo  OUTPUT 👾
 echo "~~~~~~~~~"
-echo http://$CRUDDUR_ALB_DNS:4567
+echo $CRUDDUR_ALB_DNS
 ```
 
 Create the `backend-flask` target group
@@ -772,6 +772,9 @@ aws elbv2 create-target-group \
 --vpc-id $CRUDDUR_VPC_ID \
 --ip-address-type ipv4 \
 --target-type ip \
+--health-check-protocol HTTP \
+--health-check-path /api/health-check \
+--healthy-threshold-count 3 \
 --query "TargetGroups[*].TargetGroupArn" \
 --output text)
 echo $CRUDDUR_BACKEND_FLASK_TARGETS
